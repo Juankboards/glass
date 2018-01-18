@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="style.css">
+	<title>Glass</title>
+</head>
+<body>
+	<div class="wrapper">
+		<header id="header">
+			<div id="title">
+				<div>
+					<img src="glass_logotype.png" alt="Glass logotype">
+				</div>
+			</div>
+			<div id="search">
+				<div id="search-wrapper">
+					<input type="text" id="search-input" placeholder="Search for a Professional...">
+				</div>
+				<img src="icons/search_icon.png" alt="">			
+			</div>
+		</header>
+		<section id="content">
+			<div id="grid">	
+			   <div class="grid-item" style="background-image: url(img/user1.png); background-repeat: no-repeat; background-size: cover; position:absolute;top: 70px; left: 0;">
+				<div class="grid-content">
+					<img src="icons/journalism_icon.png">
+					<h4 class="profile-thumb-category">Journalism</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile1.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">blockchain developer</h3>
+					</div>
+				</div>				
+			  </div>
+			  
+			  <div class="grid-item grid-item--height2" style="background-image: url(img/user2.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 70px; left: 33.33%;">
+			  	<div class="grid-content">
+					<img src="icons/support_icon.png">
+					<h4 class="profile-thumb-category">Support Lines</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile2.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">blockchain accountant</h3>
+					</div>
+				</div>	
+			  </div>
+			  
+			  <div class="grid-item " style="background-image: url(img/user3.png); background-repeat: no-repeat; background-size: cover; position:absolute;top: 70px; left: 66.66%;">
+			  	<div class="grid-content">
+					<img src="icons/professional_icon.png">
+					<h4 class="profile-thumb-category">Professional</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile3.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">professional massage</h3>
+					</div>
+				</div>	
+			  </div>
+
+			  <div class="grid-item" style="background-image: url(img/user4.png); background-repeat: no-repeat; background-size: cover; position:absolute;top: 370px; left: 0;">
+				<div class="grid-content">
+					<img src="icons/journalism_icon.png">
+					<h4 class="profile-thumb-category">Journalism</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile4.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">iranian independent journalist</h3>
+					</div>
+				</div>				
+			  </div>
+			  
+			  <div class="grid-item" style="background-image: url(img/user5.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 370px; left: 66.66%;">
+			  	<div class="grid-content">
+					<img src="icons/support_icon.png">
+					<h4 class="profile-thumb-category">Support Lines</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile5.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">american journalist</h3>
+					</div>
+				</div>	
+			  </div>
+			  
+			  <div class="grid-item " style="background-image: url(img/user6.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 670px; left: 0;">
+			  	<div class="grid-content">
+					<img src="icons/professional_icon.png">
+					<h4 class="profile-thumb-category">Professional</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile6.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">suicide prevention lifeline</h3>
+					</div>
+				</div>	
+			  </div>
+
+			  <div class="grid-item" style="background-image: url(img/user7.png); background-repeat: no-repeat; background-size: cover; position:absolute;top: 670px; left: 33.33%;">
+				<div class="grid-content">
+					<img src="icons/journalism_icon.png">
+					<h4 class="profile-thumb-category">Journalism</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile7.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">independent stylist</h3>
+					</div>
+				</div>				
+			  </div>
+
+			  <div class="grid-item" style="background-image: url(img/user8.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 670px; left: 66.66%;">
+			  	<div class="grid-content">
+					<img src="icons/support_icon.png">
+					<h4 class="profile-thumb-category">Support Lines</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile8.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">report domestic violence</h3>
+					</div>
+				</div>	
+			  </div>
+
+			  <div class="grid-item grid-item--height2 grid-item--width2" style="background-image: url(img/user9.png); background-repeat: no-repeat; background-size: cover; position:absolute;top: 970px; left: 0%;">
+			  	<div class="grid-content">
+					<img src="icons/professional_icon.png">
+					<h4 class="profile-thumb-category">Professional</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile9.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">human rights watch</h3>
+					</div>
+				</div>	
+			  </div>
+
+			  <div class="grid-item" style="background-image: url(img/user10.png); background-repeat: no-repeat; background-size: cover; position:absolute;top:970px; left: 66.66%;">
+				<div class="grid-content">
+					<img src="icons/journalism_icon.png">
+					<h4 class="profile-thumb-category">Journalism</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile10.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">veterans crisis line</h3>
+					</div>
+				</div>				
+			  </div>
+			  
+			 <div class="grid-item" style="background-image: url(img/user11.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 1270px; left: 66.66%;">
+			  	<div class="grid-content">
+					<img src="icons/support_icon.png">
+					<h4 class="profile-thumb-category">Support Lines</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile11.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">proffesional accountant</h3>
+					</div>
+				</div>	
+			  </div>
+			  
+			  <div class="grid-item" style="background-image: url(img/user12.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 1570px; left: 0%;">
+			  	<div class="grid-content">
+					<img src="icons/professional_icon.png">
+					<h4 class="profile-thumb-category">Professional</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile12.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">depression line</h3>
+					</div>
+				</div>	
+			  </div>
+
+			  <div class="grid-item" style="background-image: url(img/user13.png); background-repeat: no-repeat; background-size: cover; position:absolute;top: 1570px; left: 33.33%;">
+				<div class="grid-content">
+					<img src="icons/journalism_icon.png">
+					<h4 class="profile-thumb-category">Journalism</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile13.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">Proffesional trader</h3>
+					</div>
+				</div>				
+			  </div>
+			  
+			  <div class="grid-item" style="background-image: url(img/user14.png ); background-repeat: no-repeat; background-size: cover; position:absolute;top: 1570px; left: 66.66%;">
+			  	<div class="grid-content">
+					<img src="icons/support_icon.png">
+					<h4 class="profile-thumb-category">Support Lines</h4>
+					<div class="thumb-user-info">
+						<img onclick="showProfile()" src="img/profile14.png" alt="user profile picture">
+						<h3 class="profile-thumb-name" onclick="showProfile()">Soul aid</h3>
+					</div>
+				</div>	
+			  </div>
+			</div>
+		</section>
+		<section id="profile" style="background-image: url(img/background_img.png); background-repeat: no-repeat; background-size: cover;">
+			<div id="exit-profile"><img onclick="showContent()" src="icons/exit_icon.png" alt="exit icon"></div>
+			<div class="profile-wrapper">
+				<div class="profile-info-wrapper">
+					<div class="profile-name">
+						<h1>Human Rights Watch</h1>
+					</div>
+					<div class="profile-info">
+						<h3>5XYxH7svXG</h3>
+						<div class="profile-address">
+							<img src="icons/support_icon.png">
+							<h4 class="profile-thumb-category">Support Lines</h4>
+						</div>
+						<img onclick="showProfile()" src="img/profile9.png" alt="Profile picture">
+						<p>Human Rights Watch is a nonproft, nongovernmental human rights organization made up of roughly 400 staff 
+						members around the globe.<br><br>
+						Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of di-
+						verse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-fnding, 
+						impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights 
+						groups. Each year, <br><br>
+						Human Rights Watch publishes more than 100 reports and briefngs on human rights conditions in some 90 coun-
+						tries, generating extensive coverage in local and international media. With the leverage this brings, Human Rights 
+						Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, 
+						fnancial institutions, and corporations to press for changes in policy and practice that promote human rights and 
+						justice around the world.
+						</p>
+						<div class="report">
+							<h3>Report Offense</h3>
+						</div>
+					</div>
+				</div>
+			</div>			
+		</section>
+		<footer>
+			
+		</footer>
+	</div>
+</body>
+<script src="app.js"></script>
+</html>
