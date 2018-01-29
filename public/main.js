@@ -1,247 +1,52 @@
-const profiles = [{
-    "id": "0",
-    "name": "blockchain developer",
-    "category": "journalism",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile1.png",
-    "backgroundPic": "assets/img/user1.png"
-},
-{    "id": "1",
-    "name": "blockchain accountant",
-    "category": "Support Lines",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile2.png",
-    "backgroundPic": "assets/img/user2.png"
-},
-{    "id": "2",
-    "name": "professional massage",
-    "category": "Professional",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile3.png",
-    "backgroundPic": "assets/img/user3.png"
-},
-{    "id": "3",
-    "name": "iranian independent journalist",
-    "category": "Journalism",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile4.png",
-    "backgroundPic": "assets/img/user4.png"
-},
-{    "id": "4",
-    "name": "american journalist",
-    "category": "Journalism",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile5.png",
-    "backgroundPic": "assets/img/user5.png"
-},
-{    "id": "5",
-    "name": "suicide prevention lifeline",
-    "category": "Professional",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile6.png",
-    "backgroundPic": "assets/img/user6.png"
-},
-{    "id": "6",
-    "name": "independent journalist",
-    "category": "journalism",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile7.png",
-    "backgroundPic": "assets/img/user7.png"
-},
-{    "id": "7",
-    "name": "report domestic violence",
-    "category": "Support Lines",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile8.png",
-    "backgroundPic": "assets/img/user8.png"
-},
-{    "id": "8",
-    "name": "Human rights Watch",
-    "category": "Support Lines",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile9.png",
-    "backgroundPic": "assets/img/user9.png"
-},
-{    "id": "9",
-    "name": "veterans crisis Line",
-    "category": "Support Lines",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile10.png",
-    "backgroundPic": "assets/img/user10.png"
-},
-{    "id": "10",
-    "name": "independent sniper",
-    "category": "professionals",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile11.png",
-    "backgroundPic": "assets/img/user11.png"
-},
-{    "id": "11",
-    "name": "ghostwriter",
-    "category": "professionals",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile12.png",
-    "backgroundPic": "assets/img/user12.png"
-},
-{    "id": "12",
-    "name": "cryptocurrency trader",
-    "category": "professionals",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile13.png",
-    "backgroundPic": "assets/img/user13.png"
-},
-{    "id": "13",
-    "name": "independent psychology",
-    "category": "professionals",
-    "address": "5XYxH7svXG",
-    "description": "Human Rights Watch is a nonprofit, nongovernmental human rights organization made up of roughly 400 staff\
-                    members around the globe.\
-                    Its staff consists of human rights professionals including country experts, lawyers, journalists, and academics of diverse backgrounds and nationalities. Established in 1978, Human Rights Watch is known for its accurate fact-finding, \
-                    impartial reporting, effective use of media, and targeted advocacy, often in partnership with local human rights\
-                    groups. Each year,\
-                    Human Rights Watch publishes more than 100 reports and briefings on human rights conditions in some 90 countries, \
-                    generating extensive coverage in local and international media. With the leverage this brings, Human Rights \
-                    Watch meets with governments, the United Nations, regional groups like the African Union and the European Union, \
-                    financial institutions, and corporations to press for changes in policy and practice that promote human rights and \
-                    justice around the world.",
-    "profilePic": "assets/img/profile14.png",
-    "backgroundPic": "assets/img/user14.png"
-}]
-
-
-
 const grid = document.getElementById("grid");
 const profile = document.getElementById("profile");
+const page = 1;
+let profilesBatch = [],
+	profileInfo = {};
+
+document.getElementById("profile").style.display = "none";
+document.getElementById("content").style.display = "none";
+
+let path = window.location.pathname.slice(1);
+
+
+getProfiles();
+populateHome(profilesBatch, page);
+
+function historySection(path) {
+  if(path == "") {
+  	document.getElementById("profile").style.display = "none";
+	document.getElementById("content").style.display = "block";
+    // history.replaceState({title:"IcoWall-Home", url:""}, "IcoWall-Home", "");
+    // gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  }
+  // else if(path == "home") {
+  //   document.getElementById("home").click();
+  //   gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  // }else if(path == "list") {
+  //   document.getElementById("list").click();
+  //   gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  // }else if(path == "profile") {
+  //   document.getElementById("account").click();
+  //   gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  // }else if(path == "buy") {
+  //   document.getElementById("buy").click();
+  //   gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  // }
+  else if(path.split("=")[0] == "profile") {
+    // gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+    populateProfile(path.split("=")[1]);
+	document.getElementById("content").style.display = "none";
+	document.getElementById("profile").style.display = "flex";
+  }
+  // } else if(path == "emailverification" || path == "passwordrecovery") {
+  //   gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  //   return;
+  // } else {
+  //   showSection(invalidSection);
+  //   gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
+  // }
+}
 
 
 function populateHome(profiles, page) {
@@ -260,8 +65,8 @@ function generateGridContent(profiles, page){
 								<img src='"+categoryIcon+"'>\
 								<h4 class='profile-thumb-category'>"+profile.category+"</h4>\
 								<div class='thumb-user-info'>\
-									<img id='"+profile.id+"-profile-picture' onclick='showProfile(this)' src='"+profile.profilePic+"' alt='user profile picture'>\
-									<h3 id='"+profile.id+"-profile-name' class='profile-thumb-name' onclick='showProfile(this)'>"+profile.name+"</h3>\
+									<img id='"+profile._id+"-profile-picture' onclick='showProfile(this)' src='"+profile.profilePic+"' alt='user profile picture'>\
+									<h3 id='"+profile._id+"-profile-name' class='profile-thumb-name' onclick='showProfile(this)'>"+profile.name+"</h3>\
 								</div>\
 							</div>\
 						</div>\n";
@@ -270,7 +75,7 @@ function generateGridContent(profiles, page){
 }
 
 function populateProfile(profileId) {
-	const profileInfo = getProfileInfo(profileId);
+	getProfileInfo(profileId);
 	const profileContent = generateProfileContent(profileInfo);
 	profile.style.backgroundImage = "url('"+profileInfo.backgroundPic+"')"; 
 	profile.innerHTML = profileContent;
@@ -321,11 +126,25 @@ function defineCategoryIcon (category) {
 }
 
 function getProfileInfo(profileId) {
-	return profiles[profileId];
+	let httpRequest = new XMLHttpRequest();      
+	httpRequest.open('GET', '/api/getProfile?id='+profileId, false);
+	httpRequest.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+		  profileInfo = JSON.parse(this.responseText).profile;
+		} 
+	};
+	httpRequest.send();
 }
 
 function getProfiles() {
-	return profiles;
+	let httpRequest = new XMLHttpRequest();            
+	httpRequest.open('GET', '/api/getProfiles', false);
+	httpRequest.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+		  profilesBatch = JSON.parse(this.responseText).profiles;
+		} 
+	};
+	httpRequest.send();
 }
 
 function defineThumbInfoPosition (page) {
@@ -354,26 +173,29 @@ function defineThumbInfoPosition (page) {
 }
 
 function showProfile(e) {
-	const profileId = e.id.split('-')[0]
+	const profileId = e.id.split('-')[0];
+	const listObj = {title: "Glass-Icon", url: "profile=" + profileId};
+    history.pushState(listObj, listObj.title, listObj.url);
 	populateProfile(profileId);
 	document.getElementById("content").style.display = "none";
 	document.getElementById("profile").style.display = "flex";
 }
 
 function showContent() {
+	const listObj = {title: "Glass-Icon", url: "/"};
+    history.pushState(listObj, listObj.title, listObj.url);
 	document.getElementById("profile").style.display = "none";
 	document.getElementById("content").style.display = "block";
 }
 
 function resizeGrid() {
-	const profilesBatch = getProfiles();
 	const page = 1;
 	grid.innerHTML = "";
 	populateHome(profilesBatch, page);
 }
 
+window.onpopstate = function(event) {
+  historySection(window.location.pathname.slice(1));
+}
 
-
-const profilesBatch = getProfiles();
-const page = 1;
-populateHome(profilesBatch, page);
+historySection(path);
