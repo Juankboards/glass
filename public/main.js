@@ -1,17 +1,22 @@
 const grid = document.getElementById("grid");
 const profile = document.getElementById("profile");
-const page = 1;
+let page = 1,
+	increment= 1;
 let profilesBatch = [],
 	profileInfo = {};
 
 document.getElementById("profile").style.display = "none";
 document.getElementById("content").style.display = "none";
 
+
+profileImgReader  = "";
+backgroundImgReader  = ""; 
+
 let path = window.location.pathname.slice(1);
 
 
 getProfiles();
-populateHome(profilesBatch, page);
+populateHome(profilesBatch);
 
 function historySection(path) {
   if(path == "") {
@@ -49,17 +54,22 @@ function historySection(path) {
 }
 
 
-function populateHome(profiles, page) {
-	const gridContent = generateGridContent(profiles, page);
-	grid.innerHTML += gridContent;
+function populateHome(profiles) {
+	profiles.forEach(function (profilesArray){
+		const gridContent = generateGridContent(profilesArray);
+		grid.innerHTML += gridContent;
+	})
 }
 
 
-function generateGridContent(profiles, page){
+
+function generateGridContent(profiles){
+
+	const batch = profiles[1];
 	var gridContent = "";
-	profiles.forEach(function (profile, id) {
+	profiles[0].forEach(function (profile, id) {
 		const categoryIcon = defineCategoryIcon(profile.category.toLowerCase());
-		const thumbInfoPosition = defineThumbInfoPosition(page);
+		const thumbInfoPosition = defineThumbInfoPosition(batch);
 		gridContent += "<div class='grid-item' style='background-image: url(\""+profile.backgroundPic+"\"); background-repeat: no-repeat; background-size: cover; position:absolute;top:"+thumbInfoPosition.top[id]+"; left: "+thumbInfoPosition.left[id]+";width: "+thumbInfoPosition.width[id]+";height: "+thumbInfoPosition.height[id]+";'>\
 							<div class='grid-content'>\
 								<img src='"+categoryIcon+"'>\
@@ -137,33 +147,38 @@ function getProfileInfo(profileId) {
 }
 
 function getProfiles() {
+	let moreProfiles = false;
 	let httpRequest = new XMLHttpRequest();            
-	httpRequest.open('GET', '/api/getProfiles', false);
+	httpRequest.open('GET', '/api/getProfiles?page='+(page-1), false);
 	httpRequest.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
-		  profilesBatch = JSON.parse(this.responseText).profiles;
+		  if(JSON.parse(this.responseText).profiles.length){
+		  	profilesBatch.push([JSON.parse(this.responseText).profiles,page]);
+		  	moreProfiles = true;
+		  }		  
 		} 
 	};
 	httpRequest.send();
+	return moreProfiles;
 }
 
-function defineThumbInfoPosition (page) {
+function defineThumbInfoPosition (batch) {
 	var thumbInfoPosition = {};
 	var initialTop;
 	if(window.innerWidth > 1200) {
-		initialTop = (page - 1)*900 ;
+		initialTop = (batch - 1)*900 ;
 		thumbInfoPosition.top = [70 + initialTop + "px",70 + initialTop + "px",70 + initialTop + "px",70 + initialTop + "px",70 + initialTop + "px",70 + initialTop + "px",370 + initialTop + "px",370 + initialTop + "px",370 + initialTop + "px",370 + initialTop + "px",670 + initialTop + "px", 670 + initialTop + "px",670 + initialTop + "px",670 + initialTop + "px"];
 		thumbInfoPosition.left = ["0","16.66%","33.32%","49.98%","66.63%","83.3%","0","33.32%","49.98%","83.3%","0","16.66%","33.32%","83.30%"];
 		thumbInfoPosition.height = ["300px","600px","300px","300px","300px","300px","300px","300px","600px","300px","300px","300px","300px","300px"];
 		thumbInfoPosition.width = ["16.66%","16.66%","16.66%","16.66%","16.66%","16.66%","16.66%","16.66%","33.32%","16.66%","16.66%","16.66%","16.66%","16.66%"];
 	} else if(window.innerWidth <= 700) {
-		initialTop = (page - 1)*2700 ;
+		initialTop = (batch - 1)*2700 ;
 		thumbInfoPosition.top = [70 + initialTop + "px",70 + initialTop + "px",370 + initialTop + "px",670 + initialTop + "px",670 + initialTop + "px",970 + initialTop + "px",970 + initialTop + "px",1270 + initialTop + "px",1870 + initialTop + "px",1870 + initialTop + "px",2170 + initialTop + "px",2170 + initialTop + "px",2470 + initialTop + "px",2470 + initialTop + "px"];
 		thumbInfoPosition.left = ["0","50%","0","0","50%","0","50%","0","0","50%","0","50%","0","50%"];
 		thumbInfoPosition.height = ["300px","600px","300px","300px","300px","300px","300px","600px","300px","300px","300px","300px","300px","300px"];
 		thumbInfoPosition.width = ["50%","50%","50%","50%","50%","50%","50%","100%","50%","50%","50%","50%","50%","50%"];
 	} else {
-		initialTop = (page - 1)*1800 ;
+		initialTop = (batch - 1)*1800 ;
 		thumbInfoPosition.top = [70 + initialTop + "px",70 + initialTop + "px",70 + initialTop + "px",370 + initialTop + "px",370 + initialTop + "px",670 + initialTop + "px",670 + initialTop + "px",670 + initialTop + "px",970 + initialTop + "px",970 + initialTop + "px",1270 + initialTop + "px",1570 + initialTop + "px",1570 + initialTop + "px",1570 + initialTop + "px"];
 		thumbInfoPosition.left = ["0","33.33%","66.66%","0","66.66%","0","33.33%","66.66%","0","66.66%","66.66%","0","33.33%","66.66%"];
 		thumbInfoPosition.height = ["300px","600px","300px","300px","300px","300px","300px","300px","600px","300px","300px","300px","300px","300px"];
@@ -189,13 +204,384 @@ function showContent() {
 }
 
 function resizeGrid() {
-	const page = 1;
 	grid.innerHTML = "";
-	populateHome(profilesBatch, page);
+	populateHome(profilesBatch);
 }
+
+function imgSelected(input){
+	if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            if(input.id=="profile-pic"){
+            	profileImgReader = e.target.result;
+            } else {
+				backgroundImgReader = e.target.result;
+            }            
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+document.getElementById("login-icon").onclick = function(event) {
+  document.getElementById("sign-modal").style.display = "block";
+}
+
+document.getElementById("login-icon-mobile").onclick = function(event) {
+  document.getElementById("sign-modal").style.display = "block";
+}
+
+document.getElementById("close-login").onclick = function(event) {
+  document.getElementById("sign-modal").style.display = "none";
+  document.getElementById("signup-modal").style.display = "none";
+  document.getElementById("login-modal").style.display = "block";
+  document.getElementById("signup").style.display = "none";
+  document.getElementById("restore-password-email").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
+document.getElementById("close-signup").onclick = function(event) {
+  document.getElementById("sign-modal").style.display = "none";
+  document.getElementById("signup-modal").style.display = "none";
+  document.getElementById("login-modal").style.display = "block";
+  document.getElementById("signup").style.display = "none";
+  document.getElementById("restore-password-email").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
+document.getElementById("register-link").onclick = function(event) {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("restore-password-email").style.display = "none";
+  document.getElementById("signup-modal").style.display = "block";
+  document.getElementById("login-modal").style.display = "none";
+  document.getElementById("signup").style.display = "block";
+}
+
+document.getElementById("login-link").onclick = function(event) {
+  document.getElementById("signup-modal").style.display = "none";
+  document.getElementById("restore-password-email").style.display = "none";
+  document.getElementById("login-modal").style.display = "block";
+  document.getElementById("signup-modal").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
+document.getElementById("forgot-password").onclick = function(event) {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("signup").style.display = "none";
+  document.getElementById("restore-password-email").style.display = "block";
+}
+
+document.getElementById("password-reset-email").onclick = function(event) {
+  passwordResetEmail();
+}
+
+document.getElementById("signin-submit").onclick = function(event) {
+    login();
+}
+
+document.getElementById("logout-icon").onclick = function(event) {
+  signOut();
+}
+
+document.getElementById("signup-submit").onclick = function(event) {
+  const validUsername = checkFields("username")
+  const validEmail = checkFields("email")
+  if (validUsername && validEmail) {
+    registerAccount();
+  }
+}
+
+function checkFields(parameter) {
+    const input = document.getElementById(parameter);
+    if (checkUniqueness(parameter, input)) {
+      return true;
+    }
+    return false;
+}
+
+function checkUniqueness(parameter, input) {
+  let unique;
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('POST', '/api/uniqueness', false);
+  httpRequest.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      input.style.border = "none";
+      unique = true;
+    } else {
+      input.style.border = "1px solid #E34234";
+      swal("Ooops!", JSON.parse(this.responseText).message, "warning");
+      unique =  false;
+    }
+  };
+  httpRequest.setRequestHeader("Content-type", "application/json");
+  httpRequest.send(JSON.stringify({"parameter": parameter, "value": input.value}));
+  return unique;
+}
+
+function registerAccount() {
+  let submit = true;
+  let error = [];
+  const form = document.getElementById("signup-form");
+  const userInfo = {
+    "name": form[0].value,
+    "email": form[1].value,
+    "description": form[2].value,
+    "category": form[3].value,
+    "address": form[4].value,
+    "password": form[5].value,
+    "profilePic": profileImgReader,
+	"backgroundPic": backgroundImgReader
+  }
+
+  if(!checkFill(userInfo.name)){
+    submit = false;
+    error.push("Enter an username")
+    form[0].style.border = "1px solid #E34234";
+  }
+
+  if(checkSpace(userInfo.name)){
+    submit = false;
+    error.push("Don't use spaces on your username");
+    form[0].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(userInfo.email)){
+    submit = false;
+    error.push("Enter a valid email");
+    form[1].style.border = "1px solid #E34234";
+  } else {
+    if(!checkEmail(userInfo.email)){
+      submit = false;
+      error.push("The email you provided is invalid");
+      form[1].style.border = "1px solid #E34234";
+    }
+  }
+
+  if(!checkFill(userInfo.description)){
+    submit = false;
+    error.push("Enter a description")
+    form[2].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(userInfo.password)){
+    submit = false;
+    error.push("Enter a password")
+    form[5].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(form[4].value)){
+    submit = false;
+    error.push("Enter an address")
+    form[4].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(profileImgReader)){
+    submit = false;
+    error.push("Select a profile image")
+    form[7].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(backgroundImgReader)){
+    submit = false;
+    error.push("Select a background image")
+    form[8].style.border = "1px solid #E34234";
+  }
+
+  if(!checkPasswordConfirmation()){
+    submit = false;
+    error.push("The passwords didn't match"); 
+  }
+  
+
+  if(!submit){
+    swal("Watch out!", error.join(", "), "warning");
+    return false;
+  }
+
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('POST', '/api/register', false);
+  httpRequest.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("close-login").click();
+      swal("Great!", JSON.parse(this.responseText).message, "success");
+    } else {
+      swal("Sorry!", JSON.parse(this.responseText).message, "error");
+    }
+  };
+  httpRequest.setRequestHeader("Content-type", "application/json");
+  httpRequest.send(JSON.stringify(userInfo));
+}
+
+function login() {
+  let submit = true;
+  const form = document.getElementById("signin-form");
+  const userInfo = {
+    "username": form[0].value,
+    "password": form[1].value
+  }
+  if(!checkFill(userInfo.username)){
+    submit = false;
+    form[0].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(userInfo.password)){
+    submit = false;
+    form[1].style.border = "1px solid #E34234";
+  }
+
+  if(!submit){
+    return false;
+  }
+
+
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('POST', '/api/login', false);
+  httpRequest.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      location.reload();
+    } else {
+      if (this.status == 402) {
+        swal({
+          title: "Almost there!",
+          text: JSON.parse(this.responseText).message, 
+          icon: "success",
+          buttons: {
+            resend: {
+              text: "Resend verification email",
+              value: "resend",
+            },
+            Continue: true,
+          }
+      }).then((value) => {
+          switch (value) {
+            case "resend":
+                resendVerificationEmail(form[0].value);
+              break;         
+            default:
+              swal.close();
+          }
+        });
+      } else{
+        swal("Sorry!", JSON.parse(this.responseText).message, "error");
+      }
+      
+    }
+  };
+  httpRequest.setRequestHeader("Content-type", "application/json");
+  httpRequest.send(JSON.stringify(userInfo));
+}
+
+function checkSession() {
+  let status = {"logged": false, "user": {}};
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('GET', '/api/logged', false);
+  httpRequest.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      status.logged = true;
+      status.user = JSON.parse(this.responseText).user;
+    } 
+  };
+  httpRequest.setRequestHeader("Content-type", "application/json");
+  httpRequest.send();
+  return status;
+}
+
+function isLogged() {
+  const session = checkSession();
+  if(session.logged){
+    document.getElementById("login-icon").style.display = "none";
+	document.getElementById("login-icon-mobile").style.display = "none";
+	document.getElementById("logout-icon").style.display = "block";
+	if (window.innerWidth > 700) {
+		document.getElementById("logged-icon").style.display = "block";
+	} else{
+		document.getElementById("logged-icon-mobile").style.display = "block";
+	}
+  }else{
+  	if (window.innerWidth > 700) {
+		document.getElementById("login-icon").style.display = "block";
+	} else{
+		document.getElementById("login-icon-mobile").style.display = "block";
+	}
+  }
+}
+
+function signOut() {
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('GET', '/api/signout', false);
+  httpRequest.send();
+  location.reload();
+}
+
+function checkFill(value) {
+  if(value.length < 1) {
+    return false;
+  }
+  return true;
+}
+
+function checkSpace(value) {
+  const validEmail = /\s/.test(value);
+  return validEmail;
+}
+
+function checkEmail(email) {
+  const validEmail = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/.test(email.toLowerCase());
+  return validEmail;
+}
+
+function checkPasswordConfirmation() {
+  const password = document.getElementById("password"),
+    passwordConfirmation = document.getElementById("password-confirmation");
+    if(password.value != passwordConfirmation.value){
+      passwordNotEqual(password, passwordConfirmation);
+      return false;
+    }
+    return true;
+}
+
+function passwordNotEqual(field1, field2){
+  field1.value = "";
+  field2.value = "";
+}
+
+
+window.addEventListener("scroll", getProfilesWhenScroll);
+
+// function getProfilesWhenScroll() {
+function getProfilesWhenScroll(){
+	console.log((document.documentElement.scrollTop + page*70 + document.body.clientHeight),((window.innerHeight*page)))
+	if ((document.documentElement.scrollTop + page*70 + document.body.clientHeight) >= ((window.innerHeight*page))) {
+        if(increment==1){
+        	console.log("heyheyhey")
+	        page += increment;
+	        const moreProfiles = getProfiles();
+	        if(moreProfiles){	        	
+				const gridContent = generateGridContent(profilesBatch[page-1]);
+				grid.innerHTML += gridContent;
+				increment = 0;
+				setTimeout(function(){
+				    increment =1;
+				}, 300);
+	        }else{
+	        	// noMoreProfiles()
+	        }
+
+	    }
+    }
+}
+
+function noMoreProfiles(){
+	window.removeEventListener("scroll", getProfilesWhenScroll);
+}
+
+
 
 window.onpopstate = function(event) {
   historySection(window.location.pathname.slice(1));
 }
 
+
 historySection(path);
+isLogged();

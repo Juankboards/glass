@@ -24,7 +24,7 @@ module.exports = function(passport) {
   jwtOptions.secretOrKey = process.env.JWT_SECRET;
   passport.use(new JwtStrategy(jwtOptions, function(jwt_payload, done) {
       const query = {};
-      query["username"] = jwt_payload.username;
+      query["name"] = jwt_payload.name;
       db.collection("users").findOne(query, function(err, user){
           if (user) {
             delete user.password;

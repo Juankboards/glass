@@ -3,12 +3,18 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="style.css">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<link rel="icon" href="assets/icons/logo.png">
 	<title>Glass</title>
 </head>
 <body onresize="resizeGrid()">
 	<div class="wrapper">
 		<header id="header">
+			<img id="login-icon-mobile" src="assets/icons/profile.png" alt="Login icon">
+			<img id="logout-icon" src="assets/icons/logout.png" alt="Logout icon">
+			<h6 id="login-icon">Sign In</h6>
+			<img id="logged-icon-mobile" src="assets/icons/profile.png" alt="Login icon">
+			<h6 id="logged-icon">Profile</h6>
 			<div id="title">
 				<div>
 					<img src="assets/icons/glass_logotype.png" alt="Glass logotype">
@@ -20,6 +26,7 @@
 				</div>
 				<img src="assets/icons/search_icon.png" alt="">			
 			</div>
+			<img id="search-mobile" src="assets/icons/search_icon-white.png" alt="">	
 		</header>
 		<section id="content">
 			<div id="grid"></div>
@@ -27,6 +34,61 @@
 		<section id="profile" style="background-repeat: no-repeat; background-size: cover;">
 						
 		</section>
+		<div id="sign-modal" class="modal">
+			<div class="modal-content" id="login-modal">
+				<span class="close" id="close-login">X</span>
+				<div id="login">
+					<h3><span class="ico-title">SIGN IN</span></h3>			
+					<form id="signin-form">	
+						<input name="username" type="text" id="username-login" placeholder="Username" required>
+						<br>			
+						<input class="last-input" name="password" type="password" id="password-login" placeholder="Password" required>
+						<p id="forgot-password">Forgot password?</p>
+						<button type="button" id="signin-submit">SIGN IN</button>						
+					</form>
+					<p class="change-modal">Don't have an account? <a id="register-link">Register</a>.</p>
+				</div>
+				<div id="restore-password-email">
+					<h3><span class="ico-title">FORGOT PASSWORD</span></h3>			
+					<form id="password-reset-email-form">
+						<h4>Please enter your email to send you a recovery link.</h4>
+						<input name="email" type="email" id="user-email" placeholder="Email" required>
+						<button type="button" id="password-reset-email">SEND</button>
+					</form>
+				</div>
+			</div>
+			<div class="modal-content" id="signup-modal" >
+				<span class="close" id="close-signup">X</span>
+				<div id="signup">
+					<h3><span class="ico-title">SIGN UP</span></h3>	
+					<form id="signup-form">	
+						<input name="username" type="text" id="username" placeholder="Username" required>
+						<br>
+						<input name="email" type="email" id="email" placeholder="Email" required>
+						<br>
+						<textarea rows="5" cols="30" placeholder="Description" id="description" ></textarea>
+						<br>		
+						<select class="category" id="category" name="category">
+							<option value="professional"><span class="typ">Professional</span></option>
+							<option value="journalism"><span class="typ">Journalism</span></option>
+							<option value="support"><span class="typ">Support Lines</span></option>
+						</select>
+						<br>
+						<input name="address" type="text" id="address" placeholder="OSM Address" required>
+						<br>									
+						<input name="password" type="password" id="password" placeholder="New password" required>
+						<br>			
+						<input type="password" id="password-confirmation" placeholder="Password confirmation" required>
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Profile Image</label>
+						<input type="file" id="profile-pic" onchange="imgSelected(this)" name="profile-pic">		
+						<label style="color: #fff;font-size: .7em" for="background-pic">Background Image</label>				
+						<input type="file" id="background-pic" onchange="imgSelected(this)" name="background-pic">
+						<button type="button" id="signup-submit">SIGN UP</button>
+					</form>
+					<p class="change-modal">Already have an account? <a id="login-link">Login</a>.</p>				
+				</div>
+			</div>
+		</div>
 		<footer>
 			
 		</footer>

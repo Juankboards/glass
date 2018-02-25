@@ -46,41 +46,67 @@ module.exports = function(app) {
     userInfo.created = Date.now()
     bcrypt.hash(req.body.password, 10, function(err, hash) {
       userInfo.password = hash;
-      db.collection('users').save(userInfo, (err, result) => {
-        if (err) {
-          res.status(500).json({message: err});
-        } else {
-          const mailInfo = {
-              "html": '<html><div style="background-color: #323a4d;width: 80%;max-width: 750px; padding: 25px; font-family: \'Jura\', sans-serif;">\
-                      <div style="margin: 0 auto;text-align: center;"><a style="text-decoration: none;color: #fff" href="https://www.icowall.io">\
-                      <img style="width: 200px" src="https://s3.amazonaws.com/icowall/icon.png"><p style="font-size: .83em;text-align: center;margin: 0 0 0 5px;">Rentable Ad Space<br>$.25 per block/week</p>\
-                      </a></div><div style="margin: 45px auto 0px auto;"><h2 style="color: #fff;">Welcome to IcoWall!</h2><p style="color: #fff">Verify your email, click the link below</p>\
-                      <a style="color: #fff; word-wrap: break-word;" href="https://www.icowall.io/emailverification?id='+userInfo.unconfirmed+'">\
-                      https://www.icowall.io/emailverification?id='+userInfo.unconfirmed+'</a></div></div></html>',
-              "text": 'Welcome to IcoWall!\n\nVerify your email, click the link below\nhttps://www.icowall.io/emailverification?id='+userInfo.unconfirmed,
-              "subject": 'Email verification',
-              "from_email": 'info@icowall.io',
-              "from_name": "IcoWall",
-              "to": [{
-                      "email": userInfo.email,
-                      "name": userInfo.username,
-                      "type": "to"
-                  }],
-              "important": false,
-              "track_clicks": true
-          };
-          var async = false;
-          mandrill_client.messages.send({"message": mailInfo, "async": async}, function(result) {
-              console.log(result);
-          }, function(e) {
-              // Mandrill returns the error as an object with name and message keys
-              console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-              // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-          });
-          res.status(200).json({message: "Account created. You will recieve an email to confirm your account"});
-        }
-      })  
-    });
+
+      //read img
+      const dataUri = req.body.profilePic;      
+      const imageBuffer = new Buffer(dataUri.split(",")[1], "base64");
+      aws.config.region = process.env.AWS_REGION;
+      aws.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+      aws.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+      
+      // icon.filename = filename;
+      const s3 = new aws.S3();
+      const profileFilename = "profile_" + Date.now() + "_" + Math.random().toString().split(".")[1];
+      const type = dataUri.split(";")[0].split("/")[1];
+      userInfo.profilePic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + profileFilename;
+      const s3Params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: profileFilename,
+        Body: imageBuffer,
+        ContentEncoding: 'base64',
+        ContentType: "image/"+type,
+        ACL: 'public-read'
+      };
+
+      s3.putObject(s3Params, function(err, data){
+          if (err) {  
+            res.status(500).json({message: err});
+          } else {
+            console.log('succesfully uploaded the profilePic!');
+            const s32 = new aws.S3();
+            const dataUri2 = req.body.backgroundPic;      
+            const imageBuffer2 = new Buffer(dataUri2.split(",")[1], "base64");
+
+            const backgroundFilename = "background_" + Date.now() + "_" + Math.random().toString().split(".")[1];
+            const type2 = dataUri2.split(";")[0].split("/")[1];
+            userInfo.backgroundPic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + backgroundFilename;
+            const s3Params2 = {
+              Bucket: process.env.S3_BUCKET_NAME,
+              Key: backgroundFilename,
+              Body: imageBuffer2,
+              ContentEncoding: 'base64',
+              ContentType: "image/"+type2,
+              ACL: 'public-read'
+            };
+
+            s32.putObject(s3Params2, function(err, data){
+                if (err) {  
+                  res.status(500).json({message: err});
+                } else {
+                  console.log('succesfully uploaded the backgroundPic!');
+                  db.collection('users').save(userInfo, (err, result) => {
+                    if (err) {
+                      res.status(500).json({message: err});
+                    } else {
+                      res.status(200).json({message: "User stored. You will recieve an email to confirm your registration"});
+                    }
+                  })
+                }
+            });
+          }
+      });
+    })  
   });
 
   apiRoutes.get('/getapprovedicons', (req, res) => {
@@ -132,7 +158,9 @@ module.exports = function(app) {
   });
 
   apiRoutes.get('/getProfiles', (req, res) => {
-    db.collection("users").find().toArray(function (err, result) {
+    const page = req.query.page;
+    const skipAmount = parseInt(page)*14;
+    db.collection("users").find().skip(skipAmount).limit(14).toArray(function (err, result) {
       if (err) throw err
       if (result.length > 0){
         res.status(200).json({"profiles": result});
@@ -311,55 +339,55 @@ module.exports = function(app) {
               if (err) {
                 res.status(500).json({message: err});
               } else {
-                const mailInfo = {
-                    "html": '<html><div style="background-color: #323a4d;width: 80%;max-width: 750px; padding: 25px; font-family: \'Jura\', sans-serif;">\
-                                        <div style="margin: 0 auto;text-align: center;"><a style="text-decoration: none;color: #fff" href="https://www.icowall.io">\
-                                        <img style="width: 200px" src="https://s3.amazonaws.com/icowall/icon.png"><p style="font-size: .83em;text-align: center;margin: 0 0 0 5px;">Rentable Ad Space<br>$.25 per block/week</p>\
-                                        </a></div><div style="margin: 45px auto 0px auto;"><h2 style="color: #fff;">Thank you for reserving your space on IcoWall!</h2>\
-                                        <p style="color: #fff">Please make a payment of<br>'+ icon.cost_btc +'BTC to 1MLhuxruKiy2s2qK6iVjTkRpaPzhjmkGvAc g<br>or<br>'+ icon.cost_eth +'ETH to 0xa9b774Db2C919484DC4bC26604a1fEb6EdD41af2<br>When we verify the payment your icon will be available on IcoWall to the public.<br>\
-                                        Our experienced team also offers full end to end ICO advisory and marketing. Please contact info@icowall.io for information and pricing.</p>\
-                                        </div></div></html>',
-                    "text": 'Thank you for reserving your space on IcoWall!\nMake the payment of '+ icon.cost +' BTC to 1MLhuxruKiy2s2qK6iVjTkRpaPzhjmkGvA or '+ icon.cost_eth +' ETH to 0xa9b774Db2C919484DC4bC26604a1fEb6EdD41af2 \nWhen we verify the payment your icon will be available on IcoWall to the public',
-                    "subject": 'Block Reservation',
-                    "from_email": 'info@icowall.io',
-                    "from_name": "IcoWall",
-                    "to": [{
-                            "email": req.user.email,
-                            "name": req.user.username,
-                            "type": "to"
-                        }],
-                    "important": false,
-                    "track_clicks": true
-                };
-                var async = false;
-                mandrill_client.messages.send({"message": mailInfo, "async": async}, function(result) {
-                    console.log(result);
-                }, function(e) {
+                // const mailInfo = {
+                //     "html": '<html><div style="background-color: #323a4d;width: 80%;max-width: 750px; padding: 25px; font-family: \'Jura\', sans-serif;">\
+                //                         <div style="margin: 0 auto;text-align: center;"><a style="text-decoration: none;color: #fff" href="https://www.icowall.io">\
+                //                         <img style="width: 200px" src="https://s3.amazonaws.com/icowall/icon.png"><p style="font-size: .83em;text-align: center;margin: 0 0 0 5px;">Rentable Ad Space<br>$.25 per block/week</p>\
+                //                         </a></div><div style="margin: 45px auto 0px auto;"><h2 style="color: #fff;">Thank you for reserving your space on IcoWall!</h2>\
+                //                         <p style="color: #fff">Please make a payment of<br>'+ icon.cost_btc +'BTC to 1MLhuxruKiy2s2qK6iVjTkRpaPzhjmkGvAc g<br>or<br>'+ icon.cost_eth +'ETH to 0xa9b774Db2C919484DC4bC26604a1fEb6EdD41af2<br>When we verify the payment your icon will be available on IcoWall to the public.<br>\
+                //                         Our experienced team also offers full end to end ICO advisory and marketing. Please contact info@icowall.io for information and pricing.</p>\
+                //                         </div></div></html>',
+                //     "text": 'Thank you for reserving your space on IcoWall!\nMake the payment of '+ icon.cost +' BTC to 1MLhuxruKiy2s2qK6iVjTkRpaPzhjmkGvA or '+ icon.cost_eth +' ETH to 0xa9b774Db2C919484DC4bC26604a1fEb6EdD41af2 \nWhen we verify the payment your icon will be available on IcoWall to the public',
+                //     "subject": 'Block Reservation',
+                //     "from_email": 'info@icowall.io',
+                //     "from_name": "IcoWall",
+                //     "to": [{
+                //             "email": req.user.email,
+                //             "name": req.user.username,
+                //             "type": "to"
+                //         }],
+                //     "important": false,
+                //     "track_clicks": true
+                // };
+                // var async = false;
+                // mandrill_client.messages.send({"message": mailInfo, "async": async}, function(result) {
+                //     console.log(result);
+                // }, function(e) {
                     // Mandrill returns the error as an object with name and message keys
-                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                    // console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                     // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                });
-                const reservationInfo = {
-                    "text": 'Blocks reservation:\n' + JSON.stringify(icon),
-                    "subject": 'Block Reservation',
-                    "from_email": 'info@icowall.io',
-                    "from_name": "IcoWall",
-                    "to": [{
-                            "email": "info@icowall.io",
-                            "name": "Support",
-                            "type": "to"
-                        }],
-                    "important": false,
-                    "track_clicks": true
-                };
-                var async = false;
-                mandrill_client.messages.send({"message": reservationInfo, "async": async}, function(result) {
-                    console.log(result);
-                }, function(e) {
+                // });
+                // const reservationInfo = {
+                //     "text": 'Blocks reservation:\n' + JSON.stringify(icon),
+                //     "subject": 'Block Reservation',
+                //     "from_email": 'info@icowall.io',
+                //     "from_name": "IcoWall",
+                //     "to": [{
+                //             "email": "info@icowall.io",
+                //             "name": "Support",
+                //             "type": "to"
+                //         }],
+                //     "important": false,
+                //     "track_clicks": true
+                // };
+                // var async = false;
+                // mandrill_client.messages.send({"message": reservationInfo, "async": async}, function(result) {
+                //     console.log(result);
+                // }, function(e) {
                     // Mandrill returns the error as an object with name and message keys
-                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                    // console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                     // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-                });
+                // });
                 res.status(200).json({message: "Icon stored. You will recieve an email to confirm your purchase"});
               }
             })
@@ -373,7 +401,7 @@ module.exports = function(app) {
     const password = req.body.password;
     
     const query = {};
-    query["username"] = username;
+    query["name"] = username;
     db.collection("users").findOne(query, function(err, user){
       if( !user ){
         res.status(401).json({message:"no such user found"});
