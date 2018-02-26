@@ -1,7 +1,8 @@
 const grid = document.getElementById("grid");
 const profile = document.getElementById("profile");
 let page = 1,
-	increment= 1;
+	increment= 1,
+	pro_sess_id = "";
 let profilesBatch = [],
 	profileInfo = {};
 
@@ -14,7 +15,7 @@ backgroundImgReader  = "";
 
 let path = window.location.pathname.slice(1);
 
-
+isLogged();
 getProfiles();
 populateHome(profilesBatch);
 
@@ -42,6 +43,13 @@ function historySection(path) {
     // gtag('config', 'UA-109487361-1', {'page_path': '/'+path});
     populateProfile(path.split("=")[1]);
 	document.getElementById("content").style.display = "none";
+	if(pro_sess_id==path.split("=")[1]){
+		document.getElementById("edit-btn").style.display = "inline-block";
+		document.getElementById("edit-btn").onclick = function(event) {
+		  document.getElementById("edit-modal").style.display = "block";
+
+		}
+	}
 	document.getElementById("profile").style.display = "flex";
   }
   // } else if(path == "emailverification" || path == "passwordrecovery") {
@@ -97,6 +105,9 @@ function generateProfileContent(profile){
 							<div class='profile-wrapper'>\
 								<div class='profile-info-wrapper'>\
 									<div class='profile-name'>\
+										<div id='edit-btn'>\
+											<img src='assets/icons/edit_icon.png'/>\
+										</div>\
 										<h1>"+profile.name+"</h1>\
 									</div>\
 									<div class='profile-info'>\
@@ -194,6 +205,12 @@ function showProfile(e) {
 	populateProfile(profileId);
 	document.getElementById("content").style.display = "none";
 	document.getElementById("profile").style.display = "flex";
+	if(pro_sess_id==e.id.split('-')[0]){
+		document.getElementById("edit-btn").style.display = "inline-block";
+		document.getElementById("edit-btn").onclick = function(event) {
+		  document.getElementById("edit-modal").style.display = "block";
+		}
+	}
 }
 
 function showContent() {
@@ -230,6 +247,10 @@ document.getElementById("login-icon").onclick = function(event) {
 
 document.getElementById("login-icon-mobile").onclick = function(event) {
   document.getElementById("sign-modal").style.display = "block";
+}
+
+document.getElementById("close-edit").onclick = function(event) {
+  document.getElementById("edit-modal").style.display = "none";
 }
 
 document.getElementById("close-login").onclick = function(event) {
@@ -292,6 +313,14 @@ document.getElementById("signup-submit").onclick = function(event) {
   }
 }
 
+document.getElementById("edit-submit").onclick = function(event) {
+  const validUsername = checkFields("edit-username")
+  const validEmail = checkFields("edit-email")
+  if (validUsername && validEmail) {
+    editAccount();
+  }
+}
+
 function checkFields(parameter) {
     const input = document.getElementById(parameter);
     if (checkUniqueness(parameter, input)) {
@@ -337,12 +366,6 @@ function registerAccount() {
   if(!checkFill(userInfo.name)){
     submit = false;
     error.push("Enter an username")
-    form[0].style.border = "1px solid #E34234";
-  }
-
-  if(checkSpace(userInfo.name)){
-    submit = false;
-    error.push("Don't use spaces on your username");
     form[0].style.border = "1px solid #E34234";
   }
 
@@ -405,6 +428,68 @@ function registerAccount() {
     if (this.readyState == 4 && this.status == 200) {
       document.getElementById("close-login").click();
       swal("Great!", JSON.parse(this.responseText).message, "success");
+    } else {
+      swal("Sorry!", JSON.parse(this.responseText).message, "error");
+    }
+  };
+  httpRequest.setRequestHeader("Content-type", "application/json");
+  httpRequest.send(JSON.stringify(userInfo));
+}
+
+function editAccount() {
+  let submit = true;
+  let error = [];
+  const form = document.getElementById("edit-form");
+  const userInfo = {
+    "name": form[0].value,
+    "email": form[1].value,
+    "description": form[2].value,
+    "category": form[3].value,
+    "address": form[4].value
+  }
+
+  if(!checkFill(userInfo.name)){
+    submit = false;
+    error.push("Enter an username")
+    form[0].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(userInfo.email)){
+    submit = false;
+    error.push("Enter a valid email");
+    form[1].style.border = "1px solid #E34234";
+  } else {
+    if(!checkEmail(userInfo.email)){
+      submit = false;
+      error.push("The email you provided is invalid");
+      form[1].style.border = "1px solid #E34234";
+    }
+  }
+
+  if(!checkFill(userInfo.description)){
+    submit = false;
+    error.push("Enter a description")
+    form[2].style.border = "1px solid #E34234";
+  }
+
+  if(!checkFill(form[4].value)){
+    submit = false;
+    error.push("Enter an address")
+    form[4].style.border = "1px solid #E34234";
+  }  
+
+  if(!submit){
+    swal("Watch out!", error.join(", "), "warning");
+    return false;
+  }
+
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('POST', '/api/edit?id='+pro_sess_id, false);
+  httpRequest.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("close-edit").click();
+      swal("Great!", JSON.parse(this.responseText).message, "success");
+      location.reload();
     } else {
       swal("Sorry!", JSON.parse(this.responseText).message, "error");
     }
@@ -488,13 +573,26 @@ function checkSession() {
 }
 
 function isLogged() {
-  const session = checkSession();
+  session = checkSession();
   if(session.logged){
+  	pro_sess_id = session["user"]._id;
+
+
+  	const form = document.getElementById("edit-form");
+  	form[0].value = session["user"].name;
+  	form[1].value = session["user"].email;
+  	form[2].value = session["user"].description;
+  	form[3].value = session["user"].category;
+  	form[4].value = session["user"].address;
+
     document.getElementById("login-icon").style.display = "none";
 	document.getElementById("login-icon-mobile").style.display = "none";
 	document.getElementById("logout-icon").style.display = "block";
 	if (window.innerWidth > 700) {
 		document.getElementById("logged-icon").style.display = "block";
+		document.getElementById("logged-icon").onclick = function(){
+			showProfile({"id":session["user"]._id});
+		}
 	} else{
 		document.getElementById("logged-icon-mobile").style.display = "block";
 	}
@@ -511,6 +609,7 @@ function signOut() {
   let httpRequest = new XMLHttpRequest();            
   httpRequest.open('GET', '/api/signout', false);
   httpRequest.send();
+  pro_sess_id = "";
   location.reload();
 }
 
@@ -584,4 +683,3 @@ window.onpopstate = function(event) {
 
 
 historySection(path);
-isLogged();

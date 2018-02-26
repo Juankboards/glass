@@ -89,6 +89,35 @@
 				</div>
 			</div>
 		</div>
+		<div id="edit-modal" class="modal">
+			<div class="modal-content edit-modal-content">
+				<span class="close" id="close-edit">X</span>
+				<div>
+					<h3><span class="ico-title">EDIT</span></h3>	
+					<form id="edit-form">
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Username</label>
+						<input name="username" type="text" id="edit-username" placeholder="Username" required>
+						<br>
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Email</label>
+						<input name="email" type="email" id="edit-email" placeholder="Email" required>
+						<br>
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Description</label>
+						<textarea rows="5" cols="30" placeholder="Description" id="edit-description" ></textarea>
+						<br>
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Category</label>		
+						<select class="category" id="edit-category" name="category">
+							<option value="professional"><span class="typ">Professional</span></option>
+							<option value="journalism"><span class="typ">Journalism</span></option>
+							<option value="support"><span class="typ">Support Lines</span></option>
+						</select>
+						<br>
+						<label style="color: #fff;font-size: .7em" for="profile-pic">OSM Address</label>
+						<input name="address" type="text" id="edit-address" placeholder="OSM Address" required>
+						<button type="button" id="edit-submit">SUBMIT</button>
+					</form>			
+				</div>
+			</div>
+		</div>
 		<footer>
 			
 		</footer>

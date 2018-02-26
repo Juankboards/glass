@@ -298,10 +298,28 @@ border-bottom: 1px solid #fff;
 width: 80%;
 }
 
+#edit-btn{
+	width: 30px;
+	height: 30px;
+	background-color: #f6f7f7;
+	padding: 7px;
+	border-radius: 50%;
+	position: relative;
+	bottom: 3px;
+	cursor: pointer;
+	display: none;
+}
+
+#edit-btn img{
+	width: 100%;
+	cursor: pointer;
+}
+
 .profile-name h1{
 	margin-left: 50px;
 	font-size: 2.2em;
 	text-transform: uppercase;
+	display: inline;
 }
 
 .profile-info h3{
@@ -397,7 +415,7 @@ margin-right: 50px;
 	text-align: center;
 }
 
-#sign-modal{
+#sign-modal, #edit-modal{
 	display: none;
 }
 
@@ -421,6 +439,10 @@ margin-right: 50px;
 #signup-modal{
 	height: 705px;
 	display: none;
+}
+
+.edit-modal-content{
+	height: 550px;
 }
 
 #forgot-password{
@@ -457,7 +479,15 @@ margin-right: 50px;
 	padding: 0 32px;
 }
 
-#sign-modal form input, #sign-modal form select, #sign-modal form textarea{
+#edit-modal form{
+	bottom: 25px;
+	position: absolute;
+	width: 100%;
+	left: 0;
+	padding: 0 32px;
+}
+
+#sign-modal form input, #sign-modal form select, #sign-modal form textarea, #edit-modal form input, #edit-modal form select, #edit-modal form textarea{
 	border: none;
 	width: 100%;
 	padding: 10px;
@@ -465,7 +495,7 @@ margin-right: 50px;
 	background-color: #fff;
 }
 
-#sign-modal form textarea{
+#sign-modal form textarea, #edit-modal form textarea{
 	resize: none;
 }
 
@@ -473,7 +503,7 @@ margin-right: 50px;
 	margin-bottom: 0px;
 }
 
-#sign-modal form button{
+#sign-modal form button, #edit-modal form button{
 	margin: 10px auto 0 auto;
 	display: block;
 	height: 40px;

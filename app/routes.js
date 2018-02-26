@@ -109,39 +109,54 @@ module.exports = function(app) {
     })  
   });
 
-  apiRoutes.get('/getapprovedicons', (req, res) => {
-    db.collection("icons").find({approved: true}).sort({totalBlocks: -1}).toArray(function (err, result) {
-      if (err) throw err
-      if (result.length > 0){
-        res.status(200).json({"icons": result});
-      } else{
-        res.status(400).json({"message": "Unable to get Icons"});
-      }  
-    })  
+  apiRoutes.post('/edit', (req, res) => {
+    const userInfo = req.body;
+    const id = ObjectId(req.query.id);
+    const query = {};
+    query["_id"] = id;     
+    db.collection('users').update(query, {$set:userInfo}, {}, (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({message: "User has been successfully updated."});
+      }
+    })
+               
   });
 
-  apiRoutes.get('/getUniqueUsers', (req, res) => {
-    jwtClient.authorize(function (err, tokens) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      let analytics = google.analytics('v3');
-      analytics.data.ga.get({
-        'auth': jwtClient,
-        'ids': process.env.ANALYTICS_VIEW_ID,
-        'metrics': 'ga:users',
-        'start-date': '1daysAgo',
-        'end-date': 'today',
-      }, function (err, response) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        res.status(200).json({"users": response.rows[0][0]});
-      }); 
-    });
-  });
+  // apiRoutes.get('/getapprovedicons', (req, res) => {
+  //   db.collection("icons").find({approved: true}).sort({totalBlocks: -1}).toArray(function (err, result) {
+  //     if (err) throw err
+  //     if (result.length > 0){
+  //       res.status(200).json({"icons": result});
+  //     } else{
+  //       res.status(400).json({"message": "Unable to get Icons"});
+  //     }  
+  //   })  
+  // });
+
+  // apiRoutes.get('/getUniqueUsers', (req, res) => {
+  //   jwtClient.authorize(function (err, tokens) {
+  //     if (err) {
+  //       console.log(err);
+  //       return;
+  //     }
+  //     let analytics = google.analytics('v3');
+  //     analytics.data.ga.get({
+  //       'auth': jwtClient,
+  //       'ids': process.env.ANALYTICS_VIEW_ID,
+  //       'metrics': 'ga:users',
+  //       'start-date': '1daysAgo',
+  //       'end-date': 'today',
+  //     }, function (err, response) {
+  //       if (err) {
+  //         console.log(err);
+  //         return;
+  //       }
+  //       res.status(200).json({"users": response.rows[0][0]});
+  //     }); 
+  //   });
+  // });
 
   apiRoutes.get('/getProfile', (req, res) => {
     const id = ObjectId(req.query.id);
@@ -170,17 +185,17 @@ module.exports = function(app) {
     })  
   });
 
-  apiRoutes.get('/userblocks', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const id = req.user._id;
-    db.collection("icons").find({"userId": id}).toArray(function (err, result) {
-      if (err) throw err
-      if (result.length > 0){
-        res.status(200).json({"blocks": result});
-      } else{
-        res.status(400).json({"message": id});
-      }  
-    })  
-  });
+  // apiRoutes.get('/userblocks', passport.authenticate('jwt', { session: false }), (req, res) => {
+  //   const id = req.user._id;
+  //   db.collection("icons").find({"userId": id}).toArray(function (err, result) {
+  //     if (err) throw err
+  //     if (result.length > 0){
+  //       res.status(200).json({"blocks": result});
+  //     } else{
+  //       res.status(400).json({"message": id});
+  //     }  
+  //   })  
+  // });
 
   apiRoutes.post('/uniqueness', (req, res) => {
     const query = {};
@@ -222,123 +237,123 @@ module.exports = function(app) {
     res.redirect("/");
   });
 
-  apiRoutes.get("/blockcost", passport.authenticate('jwt', { session: false }), function (req, res) {
-    getCost().then((cost) => {
-      if(!cost.btc || !cost.eth){
-          res.status(404).json({message: "Price unavailable"});
-      }else{
-        res.status(200).json({message: cost});
-      } 
-    });
-  });
+  // apiRoutes.get("/blockcost", passport.authenticate('jwt', { session: false }), function (req, res) {
+  //   getCost().then((cost) => {
+  //     if(!cost.btc || !cost.eth){
+  //         res.status(404).json({message: "Price unavailable"});
+  //     }else{
+  //       res.status(200).json({message: cost});
+  //     } 
+  //   });
+  // });
 
-  function getCostInBTC() {
-    return new Promise((resolve,reject) => {
-      let cost = 0;
-      getJSON('https://api.coinmarketcap.com/v1/ticker/bitcoin/', function(error, response){ 
-        if(error){
-          reject(error)
-        }else{
-          cost = parseFloat((process.env.BLOCK_COST/parseFloat(response[0].price_usd) + 0.00000001).toFixed(8));  
-          resolve(cost);    
-        } 
-      })
-    })
-  }
+  // function getCostInBTC() {
+  //   return new Promise((resolve,reject) => {
+  //     let cost = 0;
+  //     getJSON('https://api.coinmarketcap.com/v1/ticker/bitcoin/', function(error, response){ 
+  //       if(error){
+  //         reject(error)
+  //       }else{
+  //         cost = parseFloat((process.env.BLOCK_COST/parseFloat(response[0].price_usd) + 0.00000001).toFixed(8));  
+  //         resolve(cost);    
+  //       } 
+  //     })
+  //   })
+  // }
 
-  function getCostInETH() {
-    return new Promise((resolve,reject) => {
-      let cost = 0;
-      getJSON('https://api.coinmarketcap.com/v1/ticker/ethereum/', function(error, response){ 
-        if(error){
-          reject(error)
-        }else{
-          cost = parseFloat((process.env.BLOCK_COST/parseFloat(response[0].price_usd) + 0.00000001).toFixed(8));  
-          resolve(cost);    
-        } 
-      })
-    })
-  }
+  // function getCostInETH() {
+  //   return new Promise((resolve,reject) => {
+  //     let cost = 0;
+  //     getJSON('https://api.coinmarketcap.com/v1/ticker/ethereum/', function(error, response){ 
+  //       if(error){
+  //         reject(error)
+  //       }else{
+  //         cost = parseFloat((process.env.BLOCK_COST/parseFloat(response[0].price_usd) + 0.00000001).toFixed(8));  
+  //         resolve(cost);    
+  //       } 
+  //     })
+  //   })
+  // }
 
-  function getCost() {
-    return new Promise((resolve,reject) => {
-      const cost = {"btc": 0, "eth": 0};
-      getCostInBTC().then((btcCost) => {
-        cost.btc = btcCost;        
-        getCostInETH().then((ethCost) => {
-          cost.eth = ethCost;
-          resolve(cost);  
-        });
-      });  
-    })
-  }
+  // function getCost() {
+  //   return new Promise((resolve,reject) => {
+  //     const cost = {"btc": 0, "eth": 0};
+  //     getCostInBTC().then((btcCost) => {
+  //       cost.btc = btcCost;        
+  //       getCostInETH().then((ethCost) => {
+  //         cost.eth = ethCost;
+  //         resolve(cost);  
+  //       });
+  //     });  
+  //   })
+  // }
 
 
-  apiRoutes.post("/upload", passport.authenticate('jwt', { session: false }), function (req, res) {
-    getCost().then((cost) => {
-      const blockCostBtc = cost.btc;
-      const blockCostEth = cost.eth;
-      const icon = {
-        "name": req.body.name,
-        "description": req.body.description,
-        "web": req.body.web,
-        "date": req.body.date,
-        "dateFinish": req.body.dateFinish,
-        "columnSize": req.body.columnSize,
-        "rowSize": req.body.rowSize,
-        "totalBlocks": parseInt(req.body.columnSize)*parseInt(req.body.rowSize),
-        "columns": req.body.columns,
-        "rows": req.body.rows,
-        "period": req.body.period,
-        "cost_btc": parseInt(req.body.period)*parseInt(req.body.columnSize)*parseInt(req.body.rowSize)*blockCostBtc,
-        "cost_eth": parseInt(req.body.period)*parseInt(req.body.columnSize)*parseInt(req.body.rowSize)*blockCostEth,
-        "approved": false,
-        "userId": req.user._id,
-        "username": req.user.username,
-        "social": {
-          "facebook": req.body.facebook,
-          "twitter": req.body.twitter,
-          "github": req.body.github,
-          "telegram": req.body.telegram,
-          "bitcoin": req.body.bitcoin,
-          "reddit": req.body.reddit,
-          "slack": req.body.slack
-        }
-      };
-
-      
-
-      const dataUri = req.body.image;      
-      const imageBuffer = new Buffer(dataUri.split(",")[1], "base64");
-      aws.config.region = process.env.AWS_REGION;
-      aws.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-      aws.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  // apiRoutes.post("/upload", passport.authenticate('jwt', { session: false }), function (req, res) {
+  //   getCost().then((cost) => {
+  //     const blockCostBtc = cost.btc;
+  //     const blockCostEth = cost.eth;
+  //     const icon = {
+  //       "name": req.body.name,
+  //       "description": req.body.description,
+  //       "web": req.body.web,
+  //       "date": req.body.date,
+  //       "dateFinish": req.body.dateFinish,
+  //       "columnSize": req.body.columnSize,
+  //       "rowSize": req.body.rowSize,
+  //       "totalBlocks": parseInt(req.body.columnSize)*parseInt(req.body.rowSize),
+  //       "columns": req.body.columns,
+  //       "rows": req.body.rows,
+  //       "period": req.body.period,
+  //       "cost_btc": parseInt(req.body.period)*parseInt(req.body.columnSize)*parseInt(req.body.rowSize)*blockCostBtc,
+  //       "cost_eth": parseInt(req.body.period)*parseInt(req.body.columnSize)*parseInt(req.body.rowSize)*blockCostEth,
+  //       "approved": false,
+  //       "userId": req.user._id,
+  //       "username": req.user.username,
+  //       "social": {
+  //         "facebook": req.body.facebook,
+  //         "twitter": req.body.twitter,
+  //         "github": req.body.github,
+  //         "telegram": req.body.telegram,
+  //         "bitcoin": req.body.bitcoin,
+  //         "reddit": req.body.reddit,
+  //         "slack": req.body.slack
+  //       }
+  //     };
 
       
-      // icon.filename = filename;
-      const s3 = new aws.S3();
-      const filename = "icon_" + Date.now() + "_" + Math.random().toString().split(".")[1];
-      const type = dataUri.split(";")[0].split("/")[1];
-      icon.filename = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + filename;
-      icon.type = type;
-      const s3Params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: filename,
-        Body: imageBuffer,
-        ContentEncoding: 'base64',
-        ContentType: "image/"+type,
-        ACL: 'public-read'
-      };
 
-      s3.putObject(s3Params, function(err, data){
-          if (err) {  
-            res.status(500).json({message: err});
-          } else {
-            console.log('succesfully uploaded the image!');
-            db.collection('icons').save(icon, (err, result) => {
-              if (err) {
-                res.status(500).json({message: err});
-              } else {
+  //     const dataUri = req.body.image;      
+  //     const imageBuffer = new Buffer(dataUri.split(",")[1], "base64");
+  //     aws.config.region = process.env.AWS_REGION;
+  //     aws.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  //     aws.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+      
+  //     // icon.filename = filename;
+  //     const s3 = new aws.S3();
+  //     const filename = "icon_" + Date.now() + "_" + Math.random().toString().split(".")[1];
+  //     const type = dataUri.split(";")[0].split("/")[1];
+  //     icon.filename = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + filename;
+  //     icon.type = type;
+  //     const s3Params = {
+  //       Bucket: process.env.S3_BUCKET_NAME,
+  //       Key: filename,
+  //       Body: imageBuffer,
+  //       ContentEncoding: 'base64',
+  //       ContentType: "image/"+type,
+  //       ACL: 'public-read'
+  //     };
+
+  //     s3.putObject(s3Params, function(err, data){
+  //         if (err) {  
+  //           res.status(500).json({message: err});
+  //         } else {
+  //           console.log('succesfully uploaded the image!');
+  //           db.collection('icons').save(icon, (err, result) => {
+  //             if (err) {
+  //               res.status(500).json({message: err});
+  //             } else {
                 // const mailInfo = {
                 //     "html": '<html><div style="background-color: #323a4d;width: 80%;max-width: 750px; padding: 25px; font-family: \'Jura\', sans-serif;">\
                 //                         <div style="margin: 0 auto;text-align: center;"><a style="text-decoration: none;color: #fff" href="https://www.icowall.io">\
@@ -388,13 +403,13 @@ module.exports = function(app) {
                     // console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                     // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
                 // });
-                res.status(200).json({message: "Icon stored. You will recieve an email to confirm your purchase"});
-              }
-            })
-          }
-      });
-    });
-  });
+  //               res.status(200).json({message: "Icon stored. You will recieve an email to confirm your purchase"});
+  //             }
+  //           })
+  //         }
+  //     });
+  //   });
+  // });
 
   apiRoutes.post("/login", function(req, res) {
     const username = req.body.username;
@@ -415,7 +430,7 @@ module.exports = function(app) {
       
       bcrypt.compare(password, user.password, function(err, match) {
         if(match) {
-          var payload = {username: user.username};
+          var payload = {id: user._id};
           var token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 10080 });
           res.cookie('jwt', token, { maxAge: 260000000, httpOnly: true });
           res.json({token: 'JWT ' + token});

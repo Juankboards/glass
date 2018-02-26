@@ -1,5 +1,6 @@
 const JwtStrategy = require('passport-jwt').Strategy;  
-const ExtractJwt = require('passport-jwt').ExtractJwt;  
+const ExtractJwt = require('passport-jwt').ExtractJwt; 
+const ObjectId = require('mongodb').ObjectID; 
 MongoClient = require('mongodb').MongoClient;
 
 
@@ -24,7 +25,8 @@ module.exports = function(passport) {
   jwtOptions.secretOrKey = process.env.JWT_SECRET;
   passport.use(new JwtStrategy(jwtOptions, function(jwt_payload, done) {
       const query = {};
-      query["name"] = jwt_payload.name;
+      const id = ObjectId(jwt_payload._id);
+      query["_id"] = id;
       db.collection("users").findOne(query, function(err, user){
           if (user) {
             delete user.password;
