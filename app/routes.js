@@ -19,13 +19,25 @@ const express = require('express'),
     // require('dotenv').load();
 
     MongoClient.connect(process.env.DATABASE, (err, database) => {
-      if (err) return console.log(err)
+      if (err) 
+        return;
       db = database;
     })
 
     // let jwtClient = new google.auth.JWT(
     //   analyticsAuth.client_email, null, analyticsAuth.private_key,
     //   ['https://www.googleapis.com/auth/analytics.readonly'], null);
+    function deleteImg(filename){
+      file = filename.split('/')[4];
+      const s3 = new aws.S3();
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: file
+      };
+      s3.deleteObject(params, function(err, data) {
+        return;
+      });
+    }
 
 module.exports = function(app) {  
 
@@ -57,8 +69,8 @@ module.exports = function(app) {
       
       // icon.filename = filename;
       const s3 = new aws.S3();
-      const profileFilename = "profile_" + Date.now() + "_" + Math.random().toString().split(".")[1];
       const type = dataUri.split(";")[0].split("/")[1];
+      const profileFilename = "profile_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
       userInfo.profilePic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + profileFilename;
       const s3Params = {
         Bucket: process.env.S3_BUCKET_NAME,
@@ -73,13 +85,11 @@ module.exports = function(app) {
           if (err) {  
             res.status(500).json({message: err});
           } else {
-            console.log('succesfully uploaded the profilePic!');
             const s32 = new aws.S3();
             const dataUri2 = req.body.backgroundPic;      
             const imageBuffer2 = new Buffer(dataUri2.split(",")[1], "base64");
-
-            const backgroundFilename = "background_" + Date.now() + "_" + Math.random().toString().split(".")[1];
             const type2 = dataUri2.split(";")[0].split("/")[1];
+            const backgroundFilename = "background_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
             userInfo.backgroundPic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + backgroundFilename;
             const s3Params2 = {
               Bucket: process.env.S3_BUCKET_NAME,
@@ -94,7 +104,6 @@ module.exports = function(app) {
                 if (err) {  
                   res.status(500).json({message: err});
                 } else {
-                  console.log('succesfully uploaded the backgroundPic!');
                   db.collection('users').save(userInfo, (err, result) => {
                     if (err) {
                       res.status(500).json({message: err});
@@ -113,15 +122,98 @@ module.exports = function(app) {
     const userInfo = req.body;
     const id = ObjectId(req.query.id);
     const query = {};
-    query["_id"] = id;     
-    db.collection('users').update(query, {$set:userInfo}, {}, (err, result) => {
-      if (err) {
-        res.status(500).json({message: err});
-      } else {
-        res.status(200).json({message: "User has been successfully updated."});
+    query["_id"] = id;
+    let img = req.body.profilePic || req.body.backgroundPic;
+    if(img){
+      //read img
+      const dataUri = img;
+      const imageBuffer = new Buffer(dataUri.split(",")[1], "base64");
+      aws.config.region = process.env.AWS_REGION;
+      aws.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+      aws.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+      
+      const s3 = new aws.S3();
+      const prefix = img==req.body.backgroundPic? "background_":"profile_";
+      const type = dataUri.split(";")[0].split("/")[1];
+      const imgFilename = prefix + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
+      if (img==req.body.backgroundPic){
+        userInfo.backgroundPic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + imgFilename;
+      }else{
+        userInfo.profilePic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + imgFilename;
       }
-    })
-               
+      const s3Params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: imgFilename,
+        Body: imageBuffer,
+        ContentEncoding: 'base64',
+        ContentType: "image/"+type,
+        ACL: 'public-read'
+      };
+
+      s3.putObject(s3Params, function(err, data){
+        img = req.body.profilePic || req.body.backgroundPic;
+        if (err) {  
+          res.status(500).json({message: err});
+        } else {
+          if (img==req.body.backgroundPic || !req.body.backgroundPic) {
+            db.collection('users').findOneAndUpdate(query, {$set:userInfo}, {}, (err, result) => {
+              if (err) {
+                deleteImg("https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + imgFilename);
+                res.status(500).json({message: err});                  
+              }else {
+                if (img==req.body.backgroundPic){
+                  deleteImg(result.value.backgroundPic);
+                }else{
+                  deleteImg(result.value.profilePic);
+                }
+                res.status(200).json({message: "Image has been successfully updated."});
+              }
+            })
+          } else{
+            const s32 = new aws.S3();
+            const dataUri2 = req.body.backgroundPic;      
+            const imageBuffer2 = new Buffer(dataUri2.split(",")[1], "base64");
+            const type2 = dataUri2.split(";")[0].split("/")[1];
+            const backgroundFilename = "background_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
+            userInfo.backgroundPic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + backgroundFilename;
+            const s3Params2 = {
+              Bucket: process.env.S3_BUCKET_NAME,
+              Key: backgroundFilename,
+              Body: imageBuffer2,
+              ContentEncoding: 'base64',
+              ContentType: "image/"+type2,
+              ACL: 'public-read'
+            };
+
+            s32.putObject(s3Params2, function(err, data){
+                if (err) {  
+                  res.status(500).json({message: err});
+                } else {
+                  db.collection('users').findOneAndUpdate(query, {$set:userInfo}, {}, (err, result) => {
+                    if (err) {
+                      deleteImg(userInfo.backgroundPic);
+                      deleteImg(userInfo.profilePic);
+                      res.status(500).json({message: err});
+                    } else {
+                      deleteImg(result.value.backgroundPic);
+                      deleteImg(result.value.profilePic);
+                      res.status(200).json({message: "Images has been successfully updated."});
+                    }
+                  })
+                }
+            });
+          }
+        }
+    });
+  } else{
+      db.collection('users').update(query, {$set:userInfo}, {}, (err, result) => {
+        if (err) {
+          res.status(500).json({message: err});
+        } else {
+          res.status(200).json({message: "User has been successfully updated."});
+        }
+      })
+    }        
   });
 
   // apiRoutes.get('/getapprovedicons', (req, res) => {
@@ -228,10 +320,8 @@ module.exports = function(app) {
     };
     var async = false;
     mandrill_client.messages.send({"message": mailInfo, "async": async}, function(result) {
-        console.log(result);
     }, function(e) {
         // Mandrill returns the error as an object with name and message keys
-        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
         // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     });
     res.redirect("/");
@@ -430,7 +520,6 @@ module.exports = function(app) {
       
       bcrypt.compare(password, user.password, function(err, match) {
         if(match) {
-          var payload = {id: user._id};
           var token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 10080 });
           res.cookie('jwt', token, { maxAge: 260000000, httpOnly: true });
           res.json({token: 'JWT ' + token});
@@ -448,7 +537,6 @@ module.exports = function(app) {
     }
     const query = {username: req.query.username};
     db.collection("users").findOne(query, function(err, user){
-      console.log(user)
       if(user){
         const mailInfo = {
             "html": '<html><div style="background-color: #323a4d;width: 80%;max-width: 750px; padding: 25px; font-family: \'Jura\', sans-serif;">\
@@ -471,10 +559,8 @@ module.exports = function(app) {
         };
         var async = false;
         mandrill_client.messages.send({"message": mailInfo, "async": async}, function(result) {
-            console.log(result);
         }, function(e) {
             // Mandrill returns the error as an object with name and message keys
-            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
             // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
         });
         res.status(200).json({message:"Email confirmed"});
@@ -506,7 +592,6 @@ module.exports = function(app) {
 
   apiRoutes.get("/passwordrecovery", function(req, res) {   
     const query = req.query.id;
-    console.log(query)
     if(!query){
       res.status(400).json({message: "Invalid link"});
       return;
@@ -523,7 +608,6 @@ module.exports = function(app) {
 
   apiRoutes.post("/passwordreset", function(req, res) {   
     const query = req.query.id;
-    console.log(query)
     if(!query){
       res.status(400).json({message: "Invalid link"});
       return;
@@ -535,7 +619,6 @@ module.exports = function(app) {
         { $set: {recover: "", password: hash}},
         { new: false },
        function(err, user){
-        console.log(user)
         if(user.value){
           res.status(200).json({message:"Email confirmed"});
         }else{
@@ -554,7 +637,6 @@ module.exports = function(app) {
       { $set: {recover: recover_string}},
       { new: false },
      function(err, user){
-      console.log(user)
       if(user.value){
         const mailInfo = {
             "html": '<html><div style="background-color: #323a4d;width: 80%;max-width: 750px; padding: 25px; font-family: \'Jura\', sans-serif;">\
@@ -577,10 +659,8 @@ module.exports = function(app) {
         };
         var async = false;
         mandrill_client.messages.send({"message": mailInfo, "async": async}, function(result) {
-            console.log(result);
             res.status(200).json({message:"Email sent"});
         }, function(e) {
-            console.log(e)
             res.status(408).json({message:"Error sending the email"}); 
         });
       }else{

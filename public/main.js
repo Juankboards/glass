@@ -116,7 +116,12 @@ function generateProfileContent(profile){
 											<img src='"+categoryIcon+"'>\
 											<h4 class='profile-thumb-category'>"+profile.category+"</h4>\
 										</div>\
-										<img src='"+profile.profilePic+"' alt='Profile picture'>\
+										<div class='profile-image'>\
+											<img src='"+profile.profilePic+"' alt='Profile picture'>\
+											<div id='edit-pics' onclick='openEditPicsModal()'>\
+												<p>Change Images</p>\
+											</div>\
+										</div>\
 										<p>"+profile.description+"</p>\
 										<div class='report'>\
 											<h3>Report Offense</h3>\
@@ -230,15 +235,19 @@ function imgSelected(input){
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            if(input.id=="profile-pic"){
+            if(input.id=="profile-pic" || input.id=="edit-profile-pic"){
             	profileImgReader = e.target.result;
-            } else {
+            } else if(input.id=="background-pic" || input.id=="edit-background-pic"){
 				backgroundImgReader = e.target.result;
             }            
         };
 
         reader.readAsDataURL(input.files[0]);
     }
+}
+
+function openEditPicsModal() {
+	document.getElementById("edit-pics-modal").style.display = "block";
 }
 
 document.getElementById("login-icon").onclick = function(event) {
@@ -251,6 +260,10 @@ document.getElementById("login-icon-mobile").onclick = function(event) {
 
 document.getElementById("close-edit").onclick = function(event) {
   document.getElementById("edit-modal").style.display = "none";
+}
+
+document.getElementById("close-edit-pics").onclick = function(event) {
+  document.getElementById("edit-pics-modal").style.display = "none";
 }
 
 document.getElementById("close-login").onclick = function(event) {
@@ -299,6 +312,10 @@ document.getElementById("password-reset-email").onclick = function(event) {
 
 document.getElementById("signin-submit").onclick = function(event) {
     login();
+}
+
+document.getElementById("edit-pics-submit").onclick = function(event) {
+    editPics();
 }
 
 document.getElementById("logout-icon").onclick = function(event) {
@@ -425,6 +442,8 @@ function registerAccount() {
   let httpRequest = new XMLHttpRequest();            
   httpRequest.open('POST', '/api/register', false);
   httpRequest.onreadystatechange = function () {
+  	profileImgReader="";
+	backgroundImgReader="";
     if (this.readyState == 4 && this.status == 200) {
       document.getElementById("close-login").click();
       swal("Great!", JSON.parse(this.responseText).message, "success");
@@ -488,7 +507,41 @@ function editAccount() {
   httpRequest.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       document.getElementById("close-edit").click();
-      swal("Great!", JSON.parse(this.responseText).message, "success");
+      location.reload();
+    } else {
+      swal("Sorry!", JSON.parse(this.responseText).message, "error");
+    }
+  };
+  httpRequest.setRequestHeader("Content-type", "application/json");
+  httpRequest.send(JSON.stringify(userInfo));
+}
+
+function editPics() {
+  let submit = false;
+  let error = [];
+  const form = document.getElementById("edit-pics-form");
+  let userInfo = {};
+
+  if(checkFill(profileImgReader)){
+    userInfo.profilePic = profileImgReader;
+    submit = true;
+  }
+
+  if(checkFill(backgroundImgReader)){
+    userInfo.backgroundPic = backgroundImgReader;
+    submit = true;
+  }  
+
+  if(!submit){
+    document.getElementById("close-edit-pics").click();
+    return;
+  }
+
+  let httpRequest = new XMLHttpRequest();            
+  httpRequest.open('POST', '/api/edit?id='+pro_sess_id, false);
+  httpRequest.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("close-edit-pics").click();
       location.reload();
     } else {
       swal("Sorry!", JSON.parse(this.responseText).message, "error");
@@ -650,10 +703,8 @@ window.addEventListener("scroll", getProfilesWhenScroll);
 
 // function getProfilesWhenScroll() {
 function getProfilesWhenScroll(){
-	console.log((document.documentElement.scrollTop + page*70 + document.body.clientHeight),((window.innerHeight*page)))
 	if ((document.documentElement.scrollTop + page*70 + document.body.clientHeight) >= ((window.innerHeight*page))) {
         if(increment==1){
-        	console.log("heyheyhey")
 	        page += increment;
 	        const moreProfiles = getProfiles();
 	        if(moreProfiles){	        	

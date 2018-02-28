@@ -332,12 +332,36 @@ margin-top: 15px;
 	margin-left: 50px;
 }
 
-.profile-info img{
+.profile-image{
 	position: absolute;
 	top: 295px;
 	left: 100px;
 	width: 40%;
 	max-width: 200px;
+}
+
+.profile-info .profile-image p{
+	margin: 0 auto;
+	text-align: center;
+	position: relative;
+	top: 45%;
+	transform: translateY(-50%;);
+	cursor: pointer;
+}
+
+#edit-pics{
+	background-color: rgba(66,188,155,.85);
+	color: #f6f7f7;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.profile-info img {
+	width: 100%;
 	border-radius: 50%;
 }
 
@@ -415,7 +439,7 @@ margin-right: 50px;
 	text-align: center;
 }
 
-#sign-modal, #edit-modal{
+#sign-modal, #edit-modal, #edit-pics-modal{
 	display: none;
 }
 
@@ -441,8 +465,13 @@ margin-right: 50px;
 	display: none;
 }
 
+
 .edit-modal-content{
 	height: 550px;
+}
+
+.edit-pics-modal-content{
+	height: 275px;
 }
 
 #forgot-password{
@@ -479,7 +508,7 @@ margin-right: 50px;
 	padding: 0 32px;
 }
 
-#edit-modal form{
+#edit-modal form, #edit-pics-modal form{
 	bottom: 25px;
 	position: absolute;
 	width: 100%;
@@ -487,7 +516,7 @@ margin-right: 50px;
 	padding: 0 32px;
 }
 
-#sign-modal form input, #sign-modal form select, #sign-modal form textarea, #edit-modal form input, #edit-modal form select, #edit-modal form textarea{
+#sign-modal form input, #sign-modal form select, #sign-modal form textarea, #edit-modal form input, #edit-modal form select, #edit-modal form textarea, #edit-pics-modal form input{
 	border: none;
 	width: 100%;
 	padding: 10px;
@@ -503,7 +532,7 @@ margin-right: 50px;
 	margin-bottom: 0px;
 }
 
-#sign-modal form button, #edit-modal form button{
+#sign-modal form button, #edit-modal form button, #edit-pics-modal form button{
 	margin: 10px auto 0 auto;
 	display: block;
 	height: 40px;
@@ -524,7 +553,7 @@ margin-right: 50px;
 	    margin: 150px auto 0 230px;
 	}
 
-	.profile-info img {
+	.profile-image {
 	    left: 65px;
 	    max-width: 170px;
 	}
@@ -544,7 +573,7 @@ margin-right: 50px;
 }
 
 @media only screen and (max-width: 900px) {
-	.profile-info img {
+	.profile-image {
 	    left: 50%;
 	    transform: translateX(-50%);
 	    top: 155px;
@@ -609,9 +638,13 @@ margin-right: 50px;
 		margin-right: 20px;
 	}
 
+	.profile-info .profile-image p{
+		font-size: .7em;
+	}
 	.profile-address {
 	    margin-left: 20px;
 	}
+
 	.report{
 		height: 40px;
 	}

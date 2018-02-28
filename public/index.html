@@ -118,6 +118,21 @@
 				</div>
 			</div>
 		</div>
+		<div id="edit-pics-modal" class="modal">
+			<div class="modal-content edit-pics-modal-content">
+				<span class="close" id="close-edit-pics">X</span>
+				<div>
+					<h3><span class="ico-title">CHANGE IMAGES</span></h3>	
+					<form id="edit-pics-form">
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Profile Image</label>
+						<input type="file" id="edit-profile-pic" onchange="imgSelected(this)" name="profile-pic">		
+						<label style="color: #fff;font-size: .7em" for="background-pic">Background Image</label>				
+						<input type="file" id="edit-background-pic" onchange="imgSelected(this)" name="background-pic">
+						<button type="button" id="edit-pics-submit">SUBMIT</button>
+					</form>			
+				</div>
+			</div>
+		</div>
 		<footer>
 			
 		</footer>
