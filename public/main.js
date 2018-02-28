@@ -45,6 +45,7 @@ function historySection(path) {
 	document.getElementById("content").style.display = "none";
 	if(pro_sess_id==path.split("=")[1]){
 		document.getElementById("edit-btn").style.display = "inline-block";
+		document.getElementById("edit-pics").style.display = "block";
 		document.getElementById("edit-btn").onclick = function(event) {
 		  document.getElementById("edit-modal").style.display = "block";
 
@@ -212,6 +213,7 @@ function showProfile(e) {
 	document.getElementById("profile").style.display = "flex";
 	if(pro_sess_id==e.id.split('-')[0]){
 		document.getElementById("edit-btn").style.display = "inline-block";
+		document.getElementById("edit-pics").style.display = "block";
 		document.getElementById("edit-btn").onclick = function(event) {
 		  document.getElementById("edit-modal").style.display = "block";
 		}
