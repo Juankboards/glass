@@ -1,4 +1,6 @@
+window.scrollTo(0,0);
 const grid = document.getElementById("grid");
+const list = document.getElementById("list");
 const profile = document.getElementById("profile");
 let page = 1,
 	increment= 1,
@@ -16,9 +18,9 @@ backgroundImgReader  = "";
 let path = window.location.pathname.slice(1);
 
 isLogged();
-getProfiles();
-populateHome(profilesBatch);
-
+getProfiles().then(function(moreProfiles){
+	populateHome(profilesBatch);
+});
 function historySection(path) {
   if(path == "") {
   	document.getElementById("profile").style.display = "none";
@@ -67,13 +69,14 @@ function populateHome(profiles) {
 	profiles.forEach(function (profilesArray){
 		const gridContent = generateGridContent(profilesArray);
 		grid.innerHTML += gridContent;
+		const listContent = generateListContent(profilesArray);
+		list.innerHTML += listContent;
 	})
 }
 
 
 
 function generateGridContent(profiles){
-
 	const batch = profiles[1];
 	var gridContent = "";
 	profiles[0].forEach(function (profile, id) {
@@ -93,6 +96,28 @@ function generateGridContent(profiles){
 	return gridContent;
 }
 
+function generateListContent(profiles){
+	const batch = profiles[1];
+	var listContent = "";
+	profiles[0].forEach(function (profile, id) {
+		const categoryIcon = defineCategoryIcon(profile.category.toLowerCase());
+		listContent += "<div class='list-item' style='background-image: url(\""+profile.backgroundPic+"\"); background-repeat: no-repeat; background-size: cover;'>\
+							<div class='list-content'>\
+								<h3 id='"+profile._id+"-list-name' class='profile-list-name' onclick='showProfile(this)'>"+profile.name+"</h3>\
+								<img src='"+categoryIcon+"'>\
+								<h4 class='profile-thumb-category'>"+profile.category+"</h4>\
+								<div class='list-user-info'>\
+									<img id='"+profile._id+"-list-picture' onclick='showProfile(this)' src='"+profile.profilePic+"' alt='user profile picture'>\
+									<div class='list-info'>\
+										<p class='profile-list-description'>"+profile.description+"</p>\
+									</div>\
+								</div>\
+							</div>\
+						</div>\n";
+	});
+	return listContent;
+}
+
 function populateProfile(profileId) {
 	getProfileInfo(profileId);
 	const profileContent = generateProfileContent(profileInfo);
@@ -102,7 +127,7 @@ function populateProfile(profileId) {
 
 function generateProfileContent(profile){
 	const categoryIcon = defineCategoryIcon(profile.category.toLowerCase());
-	const profileContent = "<div id='exit-profile'><img onclick='showContent()' src='assets/icons/exit_icon.png' alt='exit icon'></div>\
+	let profileContent = "<div id='exit-profile'><img onclick='showContent()' src='assets/icons/exit_icon.png' alt='exit icon'></div>\
 							<div class='profile-wrapper'>\
 								<div class='profile-info-wrapper'>\
 									<div class='profile-name'>\
@@ -118,8 +143,12 @@ function generateProfileContent(profile){
 											<h4 class='profile-thumb-category'>"+profile.category+"</h4>\
 										</div>\
 										<div class='profile-image'>\
-											<img src='"+profile.profilePic+"' alt='Profile picture'>\
-											<div id='edit-pics' onclick='openEditPicsModal()'>\
+											<img src='"+profile.profilePic+"' alt='Profile picture'>";
+  if(profile.coordinates){
+  	profileContent += "<a title='Profiles map' class='fa fa-map-marker map-profile-icon' onclick='showProfileMap("+profile.coordinates.lat+","+profile.coordinates.lng+")'></a>";
+  }
+											
+	profileContent += "<div id='edit-pics' onclick='openEditPicsModal()'>\
 												<p>Change Images</p>\
 											</div>\
 										</div>\
@@ -164,19 +193,21 @@ function getProfileInfo(profileId) {
 }
 
 function getProfiles() {
-	let moreProfiles = false;
-	let httpRequest = new XMLHttpRequest();            
-	httpRequest.open('GET', '/api/getProfiles?page='+(page-1), false);
-	httpRequest.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-		  if(JSON.parse(this.responseText).profiles.length){
-		  	profilesBatch.push([JSON.parse(this.responseText).profiles,page]);
-		  	moreProfiles = true;
-		  }		  
-		} 
-	};
-	httpRequest.send();
-	return moreProfiles;
+	return new Promise((resolve,reject) => {
+    let moreProfiles = false;
+		let httpRequest = new XMLHttpRequest();            
+		httpRequest.open('GET', '/api/getProfiles?page='+(page-1), true);
+		httpRequest.onreadystatechange = function () {
+			if (this.readyState == 4){
+				if((this.status == 200 || this.status == 304) && JSON.parse(this.responseText).profiles.length) {
+			  	profilesBatch.push([JSON.parse(this.responseText).profiles,page]);
+			  	moreProfiles = true; 
+			  }		  
+			  resolve(moreProfiles);  
+			};
+		}
+		httpRequest.send();
+  })
 }
 
 function defineThumbInfoPosition (batch) {
@@ -264,6 +295,10 @@ document.getElementById("close-edit").onclick = function(event) {
   document.getElementById("edit-modal").style.display = "none";
 }
 
+document.getElementById("close-general-map").onclick = function(event) {
+  closeMap();
+}
+
 document.getElementById("close-edit-pics").onclick = function(event) {
   document.getElementById("edit-pics-modal").style.display = "none";
 }
@@ -324,6 +359,10 @@ document.getElementById("logout-icon").onclick = function(event) {
   signOut();
 }
 
+document.getElementById("logout-icon-mobile").onclick = function(event) {
+  signOut();
+}
+
 document.getElementById("signup-submit").onclick = function(event) {
   const validUsername = checkFields("username")
   const validEmail = checkFields("email")
@@ -375,9 +414,10 @@ function registerAccount() {
     "name": form[0].value,
     "email": form[1].value,
     "description": form[2].value,
-    "category": form[3].value,
-    "address": form[4].value,
-    "password": form[5].value,
+    "location": form[3].value,
+    "category": form[4].value,
+    "address": form[5].value,
+    "password": form[6].value,
     "profilePic": profileImgReader,
 	"backgroundPic": backgroundImgReader
   }
@@ -465,8 +505,9 @@ function editAccount() {
     "name": form[0].value,
     "email": form[1].value,
     "description": form[2].value,
-    "category": form[3].value,
-    "address": form[4].value
+    "location": form[3].value,
+    "category": form[4].value,
+    "address": form[5].value
   }
 
   if(!checkFill(userInfo.name)){
@@ -553,6 +594,10 @@ function editPics() {
   httpRequest.send(JSON.stringify(userInfo));
 }
 
+function closeMap() {
+	document.getElementById("general-map-modal").style.display = "none";
+}
+
 function login() {
   let submit = true;
   const form = document.getElementById("signin-form");
@@ -637,26 +682,21 @@ function isLogged() {
   	form[0].value = session["user"].name;
   	form[1].value = session["user"].email;
   	form[2].value = session["user"].description;
-  	form[3].value = session["user"].category;
-  	form[4].value = session["user"].address;
+  	form[3].value = session["user"].location || "";
+  	form[4].value = session["user"].category;
+  	form[5].value = session["user"].address;
 
-    document.getElementById("login-icon").style.display = "none";
-	document.getElementById("login-icon-mobile").style.display = "none";
-	document.getElementById("logout-icon").style.display = "block";
-	if (window.innerWidth > 700) {
+  	document.getElementById("login-icon").style.display = "none";
+		document.getElementById("login-icon-mobile").style.display = "none";
+		document.getElementById("logout-icon").style.display = "block";
 		document.getElementById("logged-icon").style.display = "block";
 		document.getElementById("logged-icon").onclick = function(){
 			showProfile({"id":session["user"]._id});
 		}
-	} else{
+		document.getElementById("logged-icon-mobile").onclick = function(){
+			showProfile({"id":session["user"]._id});
+		}
 		document.getElementById("logged-icon-mobile").style.display = "block";
-	}
-  }else{
-  	if (window.innerWidth > 700) {
-		document.getElementById("login-icon").style.display = "block";
-	} else{
-		document.getElementById("login-icon-mobile").style.display = "block";
-	}
   }
 }
 
@@ -706,21 +746,23 @@ window.addEventListener("scroll", getProfilesWhenScroll);
 // function getProfilesWhenScroll() {
 function getProfilesWhenScroll(){
 	if ((document.documentElement.scrollTop + page*70 + document.body.clientHeight) >= ((window.innerHeight*page))) {
-        if(increment==1){
-	        page += increment;
-	        const moreProfiles = getProfiles();
-	        if(moreProfiles){	        	
-				const gridContent = generateGridContent(profilesBatch[page-1]);
-				grid.innerHTML += gridContent;
-				increment = 0;
-				setTimeout(function(){
-				    increment =1;
-				}, 300);
+      if(increment==1){
+        page += increment;
+        getProfiles().then(function(moreProfiles){
+					if(moreProfiles){	        	
+						const gridContent = generateGridContent(profilesBatch[page-1]);
+						grid.innerHTML += gridContent;
+						const listContent = generateListContent(profilesBatch[page-1]);
+						list.innerHTML += listContent;
+						increment = 0;
+						setTimeout(function(){
+						    increment =1;
+						}, 300);
 	        }else{
-	        	// noMoreProfiles()
+	        	window.removeEventListener("scroll", getProfilesWhenScroll);
 	        }
-
-	    }
+				});
+    }
     }
 }
 
@@ -731,8 +773,98 @@ function noMoreProfiles(){
 
 
 window.onpopstate = function(event) {
-  historySection(window.location.pathname.slice(1));
+	historySection(window.location.pathname.slice(1));
 }
 
 
 historySection(path);
+
+function showProfileMap(lat, lng) {
+	var mapOptions = {
+      zoom: 12,
+      center: new google.maps.LatLng(lat, lng),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+	new google.maps.Marker({
+	  position: {"lat": lat, "lng": lng},
+	  map: map
+	});
+	document.getElementById("general-map-modal").style.display = "block";
+}
+
+function showProfileMap(lat, lng) {
+	var mapOptions = {
+      zoom: 12,
+      disableDefaultUI: true,
+      zoomControl: true,
+      center: new google.maps.LatLng(lat, lng),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+	new google.maps.Marker({
+	  position: {"lat": lat, "lng": lng},
+	  map: map
+	});
+	document.getElementById("general-map-modal").style.display = "block";
+}
+
+function showGeneralMap() {
+	generateMap(profilesBatch);
+	document.getElementById("general-map-modal").style.display = "block";
+}
+
+function generateMap(profiles) {
+	var mapOptions = {
+      zoom: 0,
+      disableDefaultUI: true,
+      zoomControl: true,
+      center: new google.maps.LatLng(0, 0),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  let markersMatrix = [];
+  profiles.forEach(function(profilesArray){
+  	markersArray = [];
+  	profilesArray[0].forEach(function(profile, id){
+	  	if(profile.coordinates){
+					markersArray[id] = new google.maps.Marker({
+					  position: {"lat": profile.coordinates.lat, "lng": profile.coordinates.lng},
+					  map: map
+					});
+					var contentString = '<div id="content">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h1 style=\'color:#0a0a0a; font-size:1.5em\' id="firstHeading" class="firstHeading">'+profile.name+'</h1>'+
+            '<br><br><div id="bodyContent">'+
+            '<p style=\'color:#0a0a0a; font-size:1.2em\'>'+profile.description+'</p>'+
+            '<a style=\'color:#0a0a0a; font-size:1.2em; color: #00a; text-decoration: underline;\' id=\''+profile._id+'-profile-marker\' onclick=\'showProfile(this);closeMap()\'>Go to profile</a>'+
+            '</div>'+
+            '</div>';
+          markersArray[id].addListener('click', function() {
+	          new google.maps.InfoWindow({
+		          content: contentString
+		        }).open(map, markersArray[id]);
+	        });
+	  	}
+	  })
+  })
+}
+
+function showList() {
+	document.getElementById("list-icon").style.display = "none";
+	document.getElementById("list-desktop-icon").style.display = "none";
+	document.getElementById("grid-icon").style.display = "block";
+	document.getElementById("grid-desktop-icon").style.display = "block";
+	grid.style.display = "none";
+	list.style.display = "block";
+}
+
+function showGrid() {
+	document.getElementById("grid-icon").style.display = "none";
+	document.getElementById("grid-desktop-icon").style.display = "none";
+	document.getElementById("list-icon").style.display = "block";
+	document.getElementById("list-desktop-icon").style.display = "block";
+	list.style.display = "none";
+	grid.style.display = "block";
+}

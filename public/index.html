@@ -4,36 +4,38 @@
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="style.css">
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 	<link rel="icon" href="assets/icons/logo.png">
 	<title>Glass</title>
 </head>
 <body onresize="resizeGrid()">
 	<div class="wrapper">
 		<header id="header">
-			<img id="login-icon-mobile" src="assets/icons/profile.png" alt="Login icon">
-			<img id="logout-icon" src="assets/icons/logout.png" alt="Logout icon">
-			<h6 id="login-icon">Sign In</h6>
-			<img id="logged-icon-mobile" src="assets/icons/profile.png" alt="Login icon">
-			<h6 id="logged-icon">Profile</h6>
 			<div id="title">
 				<div>
-					<img src="assets/icons/glass_logotype.png" alt="Glass logotype">
+					<img src="assets/icons/glass_logotype.png" alt="Glass logotype" onclick="showContent()">
 				</div>
 			</div>
-			<div id="search">
-				<div id="search-wrapper">
-					<input type="text" id="search-input" placeholder="Search for a Professional...">
+			<div class="desktop-nav-icons">
+				<h6 id="login-icon">Sign In</h6>
+				<h6 id="logged-icon">Profile</h6>
+				<img id="logout-icon" src="assets/icons/logout.png" alt="Logout icon">
+				<div id="search">
+					<div id="search-wrapper">
+						<input type="text" id="search-input" placeholder="Search for a Professional...">
+					</div>
+					<img src="assets/icons/search_icon.png" alt="">			
 				</div>
-				<img src="assets/icons/search_icon.png" alt="">			
+				<a id="list-desktop-icon" title="List profiles" class="fa fa-list map-icon list-icon" onclick="showList()"></a>
+				<a id="grid-desktop-icon" title="Grid profiles" class="fa fa-th map-icon list-icon" onclick="showGrid()"></a>
+				<a title="Profiles map" class="fa fa-map-marker map-icon" onclick="showGeneralMap()"></a>	
 			</div>
-			<img id="search-mobile" src="assets/icons/search_icon-white.png" alt="">	
 		</header>
 		<section id="content">
 			<div id="grid"></div>
+			<div id="list"></div>
 		</section>
-		<section id="profile" style="background-repeat: no-repeat; background-size: cover;">
-						
-		</section>
+		<section id="profile" style="background-repeat: no-repeat; background-size: cover;"></section>
 		<div id="sign-modal" class="modal">
 			<div class="modal-content" id="login-modal">
 				<span class="close" id="close-login">X</span>
@@ -67,7 +69,9 @@
 						<input name="email" type="email" id="email" placeholder="Email" required>
 						<br>
 						<textarea rows="5" cols="30" placeholder="Description" id="description" ></textarea>
-						<br>		
+						<br>	
+						<br>
+						<input name="location" type="text" id="location" placeholder="Location">	
 						<select class="category" id="category" name="category">
 							<option value="professional"><span class="typ">Professional</span></option>
 							<option value="journalism"><span class="typ">Journalism</span></option>
@@ -104,6 +108,9 @@
 						<label style="color: #fff;font-size: .7em" for="profile-pic">Description</label>
 						<textarea rows="5" cols="30" placeholder="Description" id="edit-description" ></textarea>
 						<br>
+						<br>
+						<label style="color: #fff;font-size: .7em" for="profile-pic">Location</label>
+						<input name="location" type="text" id="edit-location" placeholder="Location">
 						<label style="color: #fff;font-size: .7em" for="profile-pic">Category</label>		
 						<select class="category" id="edit-category" name="category">
 							<option value="professional"><span class="typ">Professional</span></option>
@@ -133,10 +140,38 @@
 				</div>
 			</div>
 		</div>
+		<div id="general-map-modal" style="display: none;"  class="modal">
+			<div class="modal-content map-modal-content" style="width: 100%; height: 100%;max-width: 500px;max-height: 500px;">
+				<span class="close" id="close-general-map">X</span>
+				<div>
+					<h3><span class="ico-title">PROFILES LOCATION</span></h3>	
+					<div id="map" style="height: 400px; width: 100%;"></div>
+				</div>
+			</div>
+		</div>
 		<footer>
-			
+			<div class="footer-element">
+				<a title="profile" id="login-icon-mobile" class="fa fa-user" src="assets/icons/profile.png" alt="Login icon"></a>
+				<a title="profile" id="logged-icon-mobile" class="fa fa-user" src="assets/icons/profile.png" alt="Login icon"></a>
+			</div>
+			<div class="footer-element">
+				<a id="list-icon" title="List profiles" class="fa fa-list list-icon-mobile" onclick="showList()"></a>
+				<a id="grid-icon" title="List profiles" class="fa fa-th list-icon-mobile" onclick="showGrid()"></a>
+			</div>
+			<div class="footer-element">
+				<a title="Profiles map" class="fa fa-map-marker map-icon-mobile" onclick="showGeneralMap()"></a>
+			</div>
+			<div class="footer-element">
+				<img id="search-mobile" src="assets/icons/search_icon-white.png" alt="">
+			</div>
+			<div class="footer-element">
+				<img id="logout-icon-mobile" src="assets/icons/logout.png" alt="Logout icon">
+			</div>			
 		</footer>
 	</div>
 </body>
 <script src="main.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnkkax58kusycm-nlVQ8ElJv6AQzLUH2U">
+</script>
+
 </html>

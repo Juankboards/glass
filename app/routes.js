@@ -13,7 +13,7 @@ const express = require('express'),
     // mandrill_client = new mandrill.Mandrill(process.env.MANDRILL_API_KEY),
     MongoClient = require('mongodb').MongoClient,
     ObjectId = require('mongodb').ObjectID;
-    // getJSON = require('get-json');
+    getJSON = require('get-json');
     let db;
 
     // require('dotenv').load();
@@ -39,6 +39,24 @@ const express = require('express'),
       });
     }
 
+    function getCoords(address) {
+      return new Promise((resolve,reject) => {
+        let coordinates = {};
+        getJSON('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyBtrDnpWXmSf6M0_KBWi1D1RD2wlhEuyrs', function(error, response){ 
+          if(error){
+            reject(error)
+          }else{
+            if (response.status == "OK") {
+              coordinates = response.results[0].geometry.location;  
+              resolve(coordinates);    
+            }else{
+              resolve("");
+            }
+          } 
+        })
+      })
+    }
+
 module.exports = function(app) {  
 
 
@@ -56,66 +74,69 @@ module.exports = function(app) {
     userInfo.unconfirmed = crypto.randomBytes(20).toString('hex');
     userInfo.recover = "";
     userInfo.created = Date.now()
-    bcrypt.hash(req.body.password, 10, function(err, hash) {
-      userInfo.password = hash;
+    getCoords(userInfo.location).then(function(coordinates) {
+      userInfo.coordinates = coordinates;
+      bcrypt.hash(req.body.password, 10, function(err, hash) {
+        userInfo.password = hash;
 
-      //read img
-      const dataUri = req.body.profilePic;      
-      const imageBuffer = new Buffer(dataUri.split(",")[1], "base64");
-      aws.config.region = process.env.AWS_REGION;
-      aws.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-      aws.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+        //read img
+        const dataUri = req.body.profilePic;      
+        const imageBuffer = new Buffer(dataUri.split(",")[1], "base64");
+        aws.config.region = process.env.AWS_REGION;
+        aws.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+        aws.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
-      
-      // icon.filename = filename;
-      const s3 = new aws.S3();
-      const type = dataUri.split(";")[0].split("/")[1];
-      const profileFilename = "profile_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
-      userInfo.profilePic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + profileFilename;
-      const s3Params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: profileFilename,
-        Body: imageBuffer,
-        ContentEncoding: 'base64',
-        ContentType: "image/"+type,
-        ACL: 'public-read'
-      };
+        
+        // icon.filename = filename;
+        const s3 = new aws.S3();
+        const type = dataUri.split(";")[0].split("/")[1];
+        const profileFilename = "profile_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
+        userInfo.profilePic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + profileFilename;
+        const s3Params = {
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: profileFilename,
+          Body: imageBuffer,
+          ContentEncoding: 'base64',
+          ContentType: "image/"+type,
+          ACL: 'public-read'
+        };
 
-      s3.putObject(s3Params, function(err, data){
-          if (err) {  
-            res.status(500).json({message: err});
-          } else {
-            const s32 = new aws.S3();
-            const dataUri2 = req.body.backgroundPic;      
-            const imageBuffer2 = new Buffer(dataUri2.split(",")[1], "base64");
-            const type2 = dataUri2.split(";")[0].split("/")[1];
-            const backgroundFilename = "background_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
-            userInfo.backgroundPic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + backgroundFilename;
-            const s3Params2 = {
-              Bucket: process.env.S3_BUCKET_NAME,
-              Key: backgroundFilename,
-              Body: imageBuffer2,
-              ContentEncoding: 'base64',
-              ContentType: "image/"+type2,
-              ACL: 'public-read'
-            };
+        s3.putObject(s3Params, function(err, data){
+            if (err) {  
+              res.status(500).json({message: err});
+            } else {
+              const s32 = new aws.S3();
+              const dataUri2 = req.body.backgroundPic;      
+              const imageBuffer2 = new Buffer(dataUri2.split(",")[1], "base64");
+              const type2 = dataUri2.split(";")[0].split("/")[1];
+              const backgroundFilename = "background_" + Date.now() + "_" + Math.random().toString().split(".")[1]+"."+type;
+              userInfo.backgroundPic = "https://s3.amazonaws.com/" + process.env.S3_BUCKET_NAME +"/" + backgroundFilename;
+              const s3Params2 = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: backgroundFilename,
+                Body: imageBuffer2,
+                ContentEncoding: 'base64',
+                ContentType: "image/"+type2,
+                ACL: 'public-read'
+              };
 
-            s32.putObject(s3Params2, function(err, data){
-                if (err) {  
-                  res.status(500).json({message: err});
-                } else {
-                  db.collection('users').save(userInfo, (err, result) => {
-                    if (err) {
-                      res.status(500).json({message: err});
-                    } else {
-                      res.status(200).json({message: "User stored. You will recieve an email to confirm your registration"});
-                    }
-                  })
-                }
-            });
-          }
-      });
-    })  
+              s32.putObject(s3Params2, function(err, data){
+                  if (err) {  
+                    res.status(500).json({message: err});
+                  } else {
+                    db.collection('users').save(userInfo, (err, result) => {
+                      if (err) {
+                        res.status(500).json({message: err});
+                      } else {
+                        res.status(200).json({message: "User stored. You will recieve an email to confirm your registration"});
+                      }
+                    })
+                  }
+              });
+            }
+        });
+      })  
+    });
   });
 
   apiRoutes.post('/edit', (req, res) => {
@@ -206,13 +227,16 @@ module.exports = function(app) {
         }
     });
   } else{
-      db.collection('users').update(query, {$set:userInfo}, {}, (err, result) => {
-        if (err) {
-          res.status(500).json({message: err});
-        } else {
-          res.status(200).json({message: "User has been successfully updated."});
-        }
-      })
+      getCoords(userInfo.location).then(function(coordinates) {
+        userInfo.coordinates = coordinates;
+        db.collection('users').update(query, {$set:userInfo}, {}, (err, result) => {
+          if (err) {
+            res.status(500).json({message: err});
+          } else {
+            res.status(200).json({message: "User has been successfully updated."});
+          }
+        })
+      });
     }        
   });
 
@@ -336,20 +360,6 @@ module.exports = function(app) {
   //     } 
   //   });
   // });
-
-  // function getCostInBTC() {
-  //   return new Promise((resolve,reject) => {
-  //     let cost = 0;
-  //     getJSON('https://api.coinmarketcap.com/v1/ticker/bitcoin/', function(error, response){ 
-  //       if(error){
-  //         reject(error)
-  //       }else{
-  //         cost = parseFloat((process.env.BLOCK_COST/parseFloat(response[0].price_usd) + 0.00000001).toFixed(8));  
-  //         resolve(cost);    
-  //       } 
-  //     })
-  //   })
-  // }
 
   // function getCostInETH() {
   //   return new Promise((resolve,reject) => {
