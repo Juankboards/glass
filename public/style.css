@@ -259,7 +259,7 @@ section{
 }
 
 .grid-content, .list-content{
-	background: rgba(23,29,44,.65);
+	background: rgba(23,29,44,.85);
 	padding: 15px;
 	width: 100%;
 	height: 100%;

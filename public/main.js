@@ -4,6 +4,7 @@ const list = document.getElementById("list");
 const profile = document.getElementById("profile");
 let page = 1,
 	increment= 1,
+	markersMatrix = [],
 	pro_sess_id = "";
 let profilesBatch = [],
 	profileInfo = {};
@@ -823,31 +824,31 @@ function generateMap(profiles) {
       mapTypeId: google.maps.MapTypeId.ROADMAP
   };
   var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  let markersMatrix = [];
   profiles.forEach(function(profilesArray){
-  	markersArray = [];
+	  let markersArray = [];
   	profilesArray[0].forEach(function(profile, id){
 	  	if(profile.coordinates){
-					markersArray[id] = new google.maps.Marker({
-					  position: {"lat": profile.coordinates.lat, "lng": profile.coordinates.lng},
-					  map: map
-					});
-					var contentString = '<div id="content">'+
+	  		var contentString = '<div id="content" style=\'max-width:300px;max-height:250px\'>'+
             '<div id="siteNotice">'+
             '</div>'+
             '<h1 style=\'color:#0a0a0a; font-size:1.5em\' id="firstHeading" class="firstHeading">'+profile.name+'</h1>'+
-            '<br><br><div id="bodyContent">'+
-            '<p style=\'color:#0a0a0a; font-size:1.2em\'>'+profile.description+'</p>'+
             '<a style=\'color:#0a0a0a; font-size:1.2em; color: #00a; text-decoration: underline;\' id=\''+profile._id+'-profile-marker\' onclick=\'showProfile(this);closeMap()\'>Go to profile</a>'+
-            '</div>'+
+            '<br><br><div id="bodyContent">'+
+            '<p style=\'color:#0a0a0a; font-size:1.2em;max-height:100%;overflow:hidden\'>'+profile.description+'</p>'+'</div>'+
             '</div>';
-          markersArray[id].addListener('click', function() {
-	          new google.maps.InfoWindow({
-		          content: contentString
-		        }).open(map, markersArray[id]);
-	        });
-	  	}
-	  })
+				markersArray[id] = new google.maps.Marker({
+				  position: {"lat": profile.coordinates.lat, "lng": profile.coordinates.lng},
+				  map: map
+				});
+
+				markersArray[id].addListener('click', function() {
+          new google.maps.InfoWindow({
+	          content: contentString
+	        }).open(map, markersArray[id]);
+        });
+			}
+	  });
+	  markersMatrix.push(markersArray);
   })
 }
 
