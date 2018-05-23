@@ -783,20 +783,6 @@ historySection(path);
 function showProfileMap(lat, lng) {
 	var mapOptions = {
       zoom: 12,
-      center: new google.maps.LatLng(lat, lng),
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-  };
-  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-	new google.maps.Marker({
-	  position: {"lat": lat, "lng": lng},
-	  map: map
-	});
-	document.getElementById("general-map-modal").style.display = "block";
-}
-
-function showProfileMap(lat, lng) {
-	var mapOptions = {
-      zoom: 12,
       disableDefaultUI: true,
       zoomControl: true,
       center: new google.maps.LatLng(lat, lng),
